@@ -30,6 +30,9 @@
                         {% if profile.outcall_available %}<span class="badge text-bg-light">Выезд</span>{% endif %}
                         {% if profile.incall_available %}<span class="badge text-bg-light">У себя</span>{% endif %}
                     </p>
+                    <p class="small text-muted mb-2">
+                        Рост: {{ profile.height }} см · Вес: {{ profile.weight }} кг
+                    </p>
 <!--                    <p class="text-muted mb-2">{{ profile.get_profile_type_display }}</p>-->
 <!--                    <p class="text-muted mb-2">{{ profile.description|truncatechars:70 }}</p>-->
                     <div class="small">
