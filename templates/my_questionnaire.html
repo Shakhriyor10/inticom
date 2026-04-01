@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card sidebar-layout">
+    <aside class="sidebar">
+        <h2 class="sidebar-name">{% if profile %}{{ profile.name }}{% else %}Мой профиль{% endif %}</h2>
+        <div class="sidebar-menu">
+            <a href="{% url 'my_profile' %}">Личный кабинет</a>
+            <a href="{% url 'my_questionnaire' %}">Моя анкета</a>
+            <a href="{% url 'my_services' %}">Мои услуги</a>
+        </div>
+    </aside>
+
+    <section>
+        <h1 class="section-title">Моя анкета</h1>
+        {% if profile %}
+            <p class="section-subtitle">Полная информация вашей анкеты в аккуратном виде.</p>
+            <div class="card" style="margin: 0; box-shadow: none;">
+                <p><b>{{ profile.name }}</b>, {{ profile.age }}</p>
+                <p><b>Пол:</b> {{ profile.get_gender_display }}</p>
+                <p><b>Рост / Вес:</b> {{ profile.height }} см / {{ profile.weight }} кг</p>
+                <p><b>Тип профиля:</b> {{ profile.get_profile_type_display }}</p>
+                <p><b>Описание:</b> {{ profile.description }}</p>
+            </div>
+
+            {% if profile.photos.all %}
+                <h3>Фотографии</h3>
+                <div class="gallery">
+                    {% for photo in profile.photos.all %}
+                        <img src="{{ photo.image.url }}" alt="Фото {{ profile.name }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div style="margin-top: 16px;">
+                <a class="btn" href="{% url 'edit_profile' %}">Редактировать анкету</a>
+            </div>
+        {% else %}
+            <p>У вас пока нет анкеты.</p>
+            <a class="btn" href="{% url 'edit_profile' %}">Создать анкету</a>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
