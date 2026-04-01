@@ -23,6 +23,9 @@ class Profile(models.Model):
     profile_type = models.CharField(max_length=20, choices=ProfileType.choices)
     breast_size = models.CharField(max_length=20, blank=True)
     description = models.TextField()
+    price_per_hour = models.PositiveIntegerField('Цена анкеты за 1 час', null=True, blank=True)
+    price_for_two_hours = models.PositiveIntegerField('Цена анкеты за 2 часа', null=True, blank=True)
+    price_for_night = models.PositiveIntegerField('Цена анкеты за ночь', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -52,9 +55,6 @@ class Service(models.Model):
         verbose_name='Услуга',
     )
     description = models.TextField('Комментарий', blank=True)
-    price_per_hour = models.PositiveIntegerField('Цена за 1 час')
-    price_for_two_hours = models.PositiveIntegerField('Цена за 2 часа')
-    price_for_night = models.PositiveIntegerField('Цена за ночь')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

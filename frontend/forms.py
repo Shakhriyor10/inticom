@@ -59,6 +59,9 @@ class ProfileForm(forms.ModelForm):
             'profile_type',
             'breast_size',
             'description',
+            'price_per_hour',
+            'price_for_two_hours',
+            'price_for_night',
         ]
         labels = {
             'name': 'Имя',
@@ -69,6 +72,9 @@ class ProfileForm(forms.ModelForm):
             'profile_type': 'Тип профиля',
             'breast_size': 'Размер груди (необязательно)',
             'description': 'Описание профиля',
+            'price_per_hour': 'Общая цена за 1 час',
+            'price_for_two_hours': 'Общая цена за 2 часа',
+            'price_for_night': 'Общая цена за ночь',
         }
 
 
@@ -94,14 +100,23 @@ class ServiceForm(forms.ModelForm):
         fields = [
             'service_option',
             'description',
-            'price_per_hour',
-            'price_for_two_hours',
-            'price_for_night',
         ]
         labels = {
             'service_option': 'Выберите услугу',
             'description': 'Комментарий',
-            'price_per_hour': 'Цена за 1 час',
-            'price_for_two_hours': 'Цена за 2 часа',
-            'price_for_night': 'Цена за ночь',
+        }
+
+class ProfilePriceForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = Profile
+        fields = ['price_per_hour', 'price_for_two_hours', 'price_for_night']
+        labels = {
+            'price_per_hour': 'Общая цена за 1 час',
+            'price_for_two_hours': 'Общая цена за 2 часа',
+            'price_for_night': 'Общая цена за ночь',
         }
