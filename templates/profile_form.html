@@ -1,28 +1,29 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <h2>{% if profile %}Редактирование{% else %}Создание{% endif %} анкеты</h2>
+<div class="card" style="max-width: 760px; margin: 0 auto;">
+    <h2 class="section-title" style="font-size: 30px;">{% if profile %}Редактирование{% else %}Создание{% endif %} анкеты</h2>
+    <p class="section-subtitle">Заполните данные профиля и добавьте фотографии.</p>
 
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="form-grid">
         {% csrf_token %}
         {{ form.as_p }}
         <div class="form-row">
             <label for="photos">Фото (до 5)</label>
             <input type="file" name="photos" id="photos" multiple accept="image/*">
         </div>
-        <button class="btn" type="submit">Сохранить</button>
+        <button class="btn" type="submit">Сохранить анкету</button>
     </form>
 
     {% if profile and profile.photos.all %}
         <h3>Текущие фото</h3>
-        <div class="photos">
+        <div class="gallery">
             {% for photo in profile.photos.all %}
                 <div>
                     <img src="{{ photo.image.url }}" alt="Фото">
                     <form method="post" action="{% url 'delete_photo' photo.id %}">
                         {% csrf_token %}
-                        <button type="submit">Удалить</button>
+                        <button class="btn btn-secondary" type="submit" style="margin-top: 8px; width: 100%;">Удалить</button>
                     </form>
                 </div>
             {% endfor %}

@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EmailAuthenticationForm, ProfileForm, SignUpForm
+from .forms import EmailAuthenticationForm, ProfileForm, ServiceForm, SignUpForm
 from .models import Profile, ProfilePhoto
 
 
@@ -49,6 +49,41 @@ def my_profile(request):
 
 
 @login_required
+def my_questionnaire(request):
+    profile = Profile.objects.filter(user=request.user).prefetch_related('photos').first()
+    return render(request, 'my_questionnaire.html', {'profile': profile})
+
+
+@login_required
+def my_services(request):
+    profile = Profile.objects.filter(user=request.user).prefetch_related('services').first()
+    service_form = ServiceForm()
+
+    if request.method == 'POST' and profile:
+        service_form = ServiceForm(request.POST)
+        if service_form.is_valid():
+            service = service_form.save(commit=False)
+            service.profile = profile
+            service.save()
+            messages.success(request, 'Услуга добавлена.')
+            return redirect('my_services')
+
+    escort_services = profile.services.filter(category='escort') if profile else []
+    massage_services = profile.services.filter(category='massage') if profile else []
+
+    return render(
+        request,
+        'my_services.html',
+        {
+            'profile': profile,
+            'service_form': service_form,
+            'escort_services': escort_services,
+            'massage_services': massage_services,
+        },
+    )
+
+
+@login_required
 def create_or_edit_profile(request):
     profile = Profile.objects.filter(user=request.user).first()
 
@@ -72,7 +107,7 @@ def create_or_edit_profile(request):
                     ProfilePhoto.objects.create(profile=saved_profile, image=photo)
 
             messages.success(request, 'Анкета сохранена.')
-            return redirect('my_profile')
+            return redirect('my_questionnaire')
     else:
         form = ProfileForm(instance=profile)
 

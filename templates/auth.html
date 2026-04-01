@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <h2>Вход / Регистрация</h2>
+<div class="card" style="max-width: 520px; margin: 0 auto;">
+    <h2 class="section-title" style="font-size: 30px;">Вход / Регистрация</h2>
+    <p class="section-subtitle">Выберите режим и заполните форму.</p>
+
     <p>
-        <a href="?mode=login">Войти</a> |
-        <a href="?mode=signup">Регистрация</a>
+        <a class="btn btn-secondary" href="?mode=login">Войти</a>
+        <a class="btn btn-secondary" href="?mode=signup">Регистрация</a>
     </p>
 
     {% if mode == 'signup' %}
-        <form method="post">
+        <form method="post" class="form-grid">
             {% csrf_token %}
             <input type="hidden" name="action" value="signup">
             {{ signup_form.as_p }}
             <button class="btn" type="submit">Зарегистрироваться</button>
         </form>
     {% else %}
-        <form method="post">
+        <form method="post" class="form-grid">
             {% csrf_token %}
             <input type="hidden" name="action" value="login">
             {{ login_form.as_p }}
