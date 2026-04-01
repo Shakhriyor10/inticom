@@ -5,7 +5,7 @@
 
 <div class="card soft-card mb-4 overflow-hidden">
     <div class="card-body p-4 p-lg-5">
-        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4 align-items-lg-start">
             <div>
                 <h1 class="h2 page-title mb-1">{{ profile.name }}, {{ profile.age }}</h1>
                 <p class="muted mb-0">{{ profile.get_profile_type_display }}</p>
@@ -90,7 +90,7 @@
 
 {% for photo in profile.photos.all %}
     <div class="modal fade" id="photoModal{{ photo.id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered photo-modal-dialog">
             <div class="modal-content photo-modal-content">
                 <div class="modal-header border-0 pb-0">
                     <h3 class="h6 mb-0">Фото {{ profile.name }} #{{ forloop.counter }}</h3>
