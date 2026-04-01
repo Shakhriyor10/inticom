@@ -1,15 +1,104 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if profile %}
+<div class="card profile-layout">
+    <aside class="profile-sidebar">
+        <div class="sidebar-name">{{ profile.name }}</div>
+        <a class="sidebar-link" href="#questionnaire">Моя анкета</a>
+        <a class="sidebar-link" href="#services">Мои услуги</a>
+    </aside>
+
+    <section class="profile-main">
+        <div id="questionnaire" class="section-block">
+            <h2>Моя анкета</h2>
+            <p><b>{{ profile.name }}</b>, {{ profile.age }}</p>
+            <p>Пол: {{ profile.get_gender_display }} | Рост: {{ profile.height }} см | Вес: {{ profile.weight }} кг</p>
+            <p>Тип профиля: {{ profile.get_profile_type_display }}</p>
+            <p>{{ profile.description }}</p>
+
+            {% if profile.photos.all %}
+                <div class="photos">
+                    {% for photo in profile.photos.all %}
+                        <img src="{{ photo.image.url }}" alt="Фото {{ profile.name }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <a class="btn" href="{% url 'edit_profile' %}">Редактировать анкету</a>
+        </div>
+
+        <div id="services" class="section-block">
+            <h3>Добавить услугу</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ service_form.as_p }}
+                <button class="btn" type="submit">Добавить услугу</button>
+            </form>
+
+            <h3>Услуги для проституток</h3>
+            {% if escort_services %}
+                <table class="services-table">
+                    <thead>
+                    <tr>
+                        <th>Услуга</th>
+                        <th>Описание</th>
+                        <th>1 час</th>
+                        <th>2 часа</th>
+                        <th>Ночь</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for service in escort_services %}
+                        <tr>
+                            <td>{{ service.title }}</td>
+                            <td>{{ service.description|default:'—' }}</td>
+                            <td>{{ service.price_per_hour }}</td>
+                            <td>{{ service.price_for_two_hours }}</td>
+                            <td>{{ service.price_for_night }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Пока нет услуг в этой категории.</p>
+            {% endif %}
+
+            <h3>Услуги для массажа</h3>
+            {% if massage_services %}
+                <table class="services-table">
+                    <thead>
+                    <tr>
+                        <th>Услуга</th>
+                        <th>Описание</th>
+                        <th>1 час</th>
+                        <th>2 часа</th>
+                        <th>Ночь</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for service in massage_services %}
+                        <tr>
+                            <td>{{ service.title }}</td>
+                            <td>{{ service.description|default:'—' }}</td>
+                            <td>{{ service.price_per_hour }}</td>
+                            <td>{{ service.price_for_two_hours }}</td>
+                            <td>{{ service.price_for_night }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Пока нет услуг в этой категории.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% else %}
 <div class="card">
     <h2>Мой профиль</h2>
-    {% if profile %}
-        <p><b>{{ profile.name }}</b>, {{ profile.age }}</p>
-        <p>{{ profile.description }}</p>
-        <a class="btn" href="{% url 'edit_profile' %}">Редактировать анкету</a>
-    {% else %}
-        <p>У вас пока нет анкеты.</p>
-        <a class="btn" href="{% url 'edit_profile' %}">Создать анкету</a>
-    {% endif %}
+    <p>У вас пока нет анкеты.</p>
+    <a class="btn" href="{% url 'edit_profile' %}">Создать анкету</a>
 </div>
+{% endif %}
 {% endblock %}

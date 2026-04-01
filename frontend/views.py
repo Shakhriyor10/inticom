@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EmailAuthenticationForm, ProfileForm, SignUpForm
+from .forms import EmailAuthenticationForm, ProfileForm, ServiceForm, SignUpForm
 from .models import Profile, ProfilePhoto
 
 
@@ -44,8 +44,31 @@ def logout_view(request):
 
 @login_required
 def my_profile(request):
-    profile = Profile.objects.filter(user=request.user).first()
-    return render(request, 'my_profile.html', {'profile': profile})
+    profile = Profile.objects.filter(user=request.user).prefetch_related('photos', 'services').first()
+    service_form = ServiceForm()
+
+    if request.method == 'POST' and profile:
+        service_form = ServiceForm(request.POST)
+        if service_form.is_valid():
+            new_service = service_form.save(commit=False)
+            new_service.profile = profile
+            new_service.save()
+            messages.success(request, 'Услуга добавлена.')
+            return redirect('my_profile')
+
+    escort_services = profile.services.filter(category='escort') if profile else []
+    massage_services = profile.services.filter(category='massage') if profile else []
+
+    return render(
+        request,
+        'my_profile.html',
+        {
+            'profile': profile,
+            'service_form': service_form,
+            'escort_services': escort_services,
+            'massage_services': massage_services,
+        },
+    )
 
 
 @login_required
