@@ -10,7 +10,7 @@ class ProfilePhotoInline(admin.TabularInline):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'age', 'profile_type', 'created_at')
+    list_display = ('name', 'user', 'age', 'profile_type', 'price_per_hour', 'price_for_two_hours', 'price_for_night', 'created_at')
     inlines = [ProfilePhotoInline]
 
 
@@ -28,6 +28,6 @@ class ServiceOptionAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'service_option', 'price_per_hour', 'price_for_two_hours', 'price_for_night')
+    list_display = ('profile', 'service_option')
     list_filter = ('service_option__category',)
     search_fields = ('profile__name', 'service_option__title')

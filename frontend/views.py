@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EmailAuthenticationForm, ProfileForm, ServiceForm, SignUpForm
+from .forms import EmailAuthenticationForm, ProfileForm, ProfilePriceForm, ServiceForm, SignUpForm
 from .models import Profile, ProfilePhoto, Service
 
 
@@ -69,19 +69,29 @@ def my_services(request):
             available_categories.append(Service.Category.MASSAGE)
 
     service_form = ServiceForm(profile=profile, available_categories=available_categories)
+    price_form = ProfilePriceForm(instance=profile) if profile else None
 
     if request.method == 'POST' and profile:
-        service_form = ServiceForm(
-            request.POST,
-            profile=profile,
-            available_categories=available_categories,
-        )
-        if service_form.is_valid():
-            service = service_form.save(commit=False)
-            service.profile = profile
-            service.save()
-            messages.success(request, 'Услуга добавлена.')
-            return redirect('my_services')
+        action = request.POST.get('action')
+
+        if action == 'save_prices':
+            price_form = ProfilePriceForm(request.POST, instance=profile)
+            if price_form.is_valid():
+                price_form.save()
+                messages.success(request, 'Цены анкеты обновлены.')
+                return redirect('my_services')
+        else:
+            service_form = ServiceForm(
+                request.POST,
+                profile=profile,
+                available_categories=available_categories,
+            )
+            if service_form.is_valid():
+                service = service_form.save(commit=False)
+                service.profile = profile
+                service.save()
+                messages.success(request, 'Услуга добавлена.')
+                return redirect('my_services')
 
     escort_services = (
         profile.services.filter(service_option__category=Service.Category.ESCORT) if profile else []
@@ -96,6 +106,7 @@ def my_services(request):
         {
             'profile': profile,
             'service_form': service_form,
+            'price_form': price_form,
             'escort_services': escort_services,
             'massage_services': massage_services,
         },

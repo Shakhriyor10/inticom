@@ -8,9 +8,9 @@
     </div>
 </div>
 
-<div class="row g-4">
+<div class="row g-3">
     {% for profile in profiles %}
-        <div class="col-sm-6 col-lg-4">
+        <div class="col-sm-6 col-lg-4 col-xl-3">
             <article class="card soft-card h-100 overflow-hidden">
                 {% with first_photo=profile.photos.first %}
                     {% if first_photo %}
@@ -22,7 +22,12 @@
                 <div class="card-body">
                     <p class="mb-1"><b>{{ profile.name }}</b>, {{ profile.age }}</p>
                     <p class="text-muted mb-2">{{ profile.get_profile_type_display }}</p>
-                    <p class="text-muted mb-0">{{ profile.description|truncatechars:95 }}</p>
+                    <p class="text-muted mb-2">{{ profile.description|truncatechars:70 }}</p>
+                    <div class="small">
+                        <div><b>1 час:</b> {{ profile.price_per_hour|default:'—' }}</div>
+                        <div><b>2 часа:</b> {{ profile.price_for_two_hours|default:'—' }}</div>
+                        <div><b>Ночь:</b> {{ profile.price_for_night|default:'—' }}</div>
+                    </div>
                 </div>
             </article>
         </div>
