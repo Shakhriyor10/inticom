@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Анкеты</h1>
+<div class="card">
+    <h1 class="section-title">Анкеты</h1>
+    <p class="section-subtitle">Современный каталог анкет с быстрым просмотром.</p>
+</div>
+
 <div class="profiles-grid">
     {% for profile in profiles %}
         <article class="profile-card">
@@ -15,13 +19,13 @@
                 {% endwith %}
             </div>
             <div class="profile-meta">
-                <p><b>Имя:</b> {{ profile.name }}</p>
-                <p><b>Возраст:</b> {{ profile.age }}</p>
-                <p><b>Размер груди:</b> {{ profile.breast_size|default:'Не указан' }}</p>
+                <p><b>{{ profile.name }}</b>, {{ profile.age }}</p>
+                <p>{{ profile.get_profile_type_display }}</p>
+                <p style="color:#64748b;">{{ profile.description|truncatechars:95 }}</p>
             </div>
         </article>
     {% empty %}
-        <p>Пока нет анкет.</p>
+        <div class="card"><p>Пока нет анкет.</p></div>
     {% endfor %}
 </div>
 {% endblock %}

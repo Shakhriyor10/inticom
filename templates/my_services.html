@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card sidebar-layout">
+    <aside class="sidebar">
+        <h2 class="sidebar-name">{% if profile %}{{ profile.name }}{% else %}Мой профиль{% endif %}</h2>
+        <div class="sidebar-menu">
+            <a href="{% url 'my_profile' %}">Личный кабинет</a>
+            <a href="{% url 'my_questionnaire' %}">Моя анкета</a>
+            <a href="{% url 'my_services' %}">Мои услуги</a>
+        </div>
+    </aside>
+
+    <section>
+        <h1 class="section-title">Мои услуги</h1>
+        {% if profile %}
+            <p class="section-subtitle">Добавляйте услуги и указывайте стоимость за 1 час, 2 часа и ночь.</p>
+
+            <div class="card" style="margin: 0 0 16px; box-shadow: none;">
+                <h3 style="margin-top: 0;">Добавить услугу</h3>
+                <form method="post" class="form-grid">
+                    {% csrf_token %}
+                    {{ service_form.as_p }}
+                    <button class="btn" type="submit">Сохранить услугу</button>
+                </form>
+            </div>
+
+            <h3>Услуги для проституток</h3>
+            {% if escort_services %}
+                <table class="services-table">
+                    <thead>
+                    <tr>
+                        <th>Услуга</th>
+                        <th>Описание</th>
+                        <th>1 час</th>
+                        <th>2 часа</th>
+                        <th>Ночь</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for service in escort_services %}
+                        <tr>
+                            <td>{{ service.title }}</td>
+                            <td>{{ service.description|default:'—' }}</td>
+                            <td>{{ service.price_per_hour }}</td>
+                            <td>{{ service.price_for_two_hours }}</td>
+                            <td>{{ service.price_for_night }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Пока нет услуг в этой категории.</p>
+            {% endif %}
+
+            <h3>Услуги для массажа</h3>
+            {% if massage_services %}
+                <table class="services-table">
+                    <thead>
+                    <tr>
+                        <th>Услуга</th>
+                        <th>Описание</th>
+                        <th>1 час</th>
+                        <th>2 часа</th>
+                        <th>Ночь</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for service in massage_services %}
+                        <tr>
+                            <td>{{ service.title }}</td>
+                            <td>{{ service.description|default:'—' }}</td>
+                            <td>{{ service.price_per_hour }}</td>
+                            <td>{{ service.price_for_two_hours }}</td>
+                            <td>{{ service.price_for_night }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Пока нет услуг в этой категории.</p>
+            {% endif %}
+        {% else %}
+            <p>Сначала создайте анкету, чтобы добавить услуги.</p>
+            <a class="btn" href="{% url 'edit_profile' %}">Создать анкету</a>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

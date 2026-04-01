@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Profile
+from .models import Profile, Service
 
 
 class EmailAuthenticationForm(AuthenticationForm):
@@ -54,4 +54,25 @@ class ProfileForm(forms.ModelForm):
             'profile_type': 'Тип профиля',
             'breast_size': 'Размер груди (необязательно)',
             'description': 'Описание профиля',
+        }
+
+
+class ServiceForm(forms.ModelForm):
+    class Meta:
+        model = Service
+        fields = [
+            'category',
+            'title',
+            'description',
+            'price_per_hour',
+            'price_for_two_hours',
+            'price_for_night',
+        ]
+        labels = {
+            'category': 'Категория услуги',
+            'title': 'Название услуги',
+            'description': 'Описание услуги',
+            'price_per_hour': 'Цена за 1 час',
+            'price_for_two_hours': 'Цена за 2 часа',
+            'price_for_night': 'Цена за ночь',
         }

@@ -2,13 +2,22 @@
 
 {% block content %}
 <div class="card">
-    <h2>Мой профиль</h2>
+    <h1 class="section-title">Личный кабинет</h1>
+    <p class="section-subtitle">Удобная навигация по вашему профилю, анкете и услугам.</p>
+
     {% if profile %}
-        <p><b>{{ profile.name }}</b>, {{ profile.age }}</p>
-        <p>{{ profile.description }}</p>
-        <a class="btn" href="{% url 'edit_profile' %}">Редактировать анкету</a>
+        <div class="dashboard-grid">
+            <a class="feature-card" href="{% url 'my_questionnaire' %}">
+                <h3>Моя анкета</h3>
+                <p>Просмотр анкеты, фотографий и быстрый переход к редактированию.</p>
+            </a>
+            <a class="feature-card" href="{% url 'my_services' %}">
+                <h3>Мои услуги</h3>
+                <p>Добавление услуг и цен: за 1 час, 2 часа и за ночь.</p>
+            </a>
+        </div>
     {% else %}
-        <p>У вас пока нет анкеты.</p>
+        <p>У вас пока нет анкеты. Начните с создания профиля.</p>
         <a class="btn" href="{% url 'edit_profile' %}">Создать анкету</a>
     {% endif %}
 </div>
