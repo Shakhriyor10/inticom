@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Анкеты</h1>
+<div class="profiles-grid">
+    {% for profile in profiles %}
+        <article class="profile-card">
+            <div class="profile-photo-wrap">
+                {% with first_photo=profile.photos.first %}
+                    {% if first_photo %}
+                        <img class="profile-photo" src="{{ first_photo.image.url }}" alt="Фото {{ profile.name }}">
+                    {% else %}
+                        <div class="profile-photo profile-photo-placeholder">Нет фото</div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="profile-meta">
+                <p><b>Имя:</b> {{ profile.name }}</p>
+                <p><b>Возраст:</b> {{ profile.age }}</p>
+                <p><b>Размер груди:</b> {{ profile.breast_size|default:'Не указан' }}</p>
+            </div>
+        </article>
+    {% empty %}
+        <p>Пока нет анкет.</p>
+    {% endfor %}
+</div>
+{% endblock %}
