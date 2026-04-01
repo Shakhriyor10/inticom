@@ -96,15 +96,17 @@
             overflow-x: auto;
             padding-bottom: .1rem;
             scrollbar-width: thin;
+            align-items: stretch;
         }
         .price-card {
             flex: 1 0 0;
             min-width: 145px;
             border: 1px solid var(--theme-card-border);
             border-radius: .85rem;
-            background: #fff;
-            padding: .55rem .7rem;
+            background: linear-gradient(180deg, #fff 0%, #fff4f8 100%);
+            padding: .65rem .75rem;
             text-align: center;
+            box-shadow: 0 8px 20px rgba(214, 51, 108, 0.1);
         }
         .price-label {
             font-size: .8rem;
@@ -122,13 +124,25 @@
             border-radius: 1rem;
             max-width: min(680px, calc(100vw - 1.5rem));
             margin: 0 auto;
+            background: linear-gradient(180deg, #fff 0%, #fff6fa 100%);
+        }
+        .photo-frame {
+            width: 100%;
+            height: min(68vh, 560px);
+            border-radius: .85rem;
+            border: 1px solid var(--theme-card-border);
+            background: #fff;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            padding: .35rem;
         }
         .photo-modal-image {
             width: 100%;
-            max-height: min(68vh, 620px);
+            height: 100%;
             object-fit: contain;
-            border-radius: .75rem;
-            background: #fff7fa;
+            border-radius: .65rem;
+            background: #fff;
         }
         .table thead th { white-space: nowrap; }
     </style>

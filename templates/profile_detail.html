@@ -97,7 +97,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body pt-2">
-                    <img class="photo-modal-image" src="{{ photo.image.url }}" alt="Увеличенное фото {{ profile.name }} {{ forloop.counter }}">
+                    <div class="photo-frame">
+                        <img class="photo-modal-image" src="{{ photo.image.url }}" alt="Увеличенное фото {{ profile.name }} {{ forloop.counter }}">
+                    </div>
                 </div>
             </div>
         </div>
