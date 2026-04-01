@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -48,7 +49,6 @@ class User(AbstractUser):
     phone_number = models.CharField('Номер телефона', max_length=20, blank=True, null=True)
     telegram_username = models.CharField('Telegram username', max_length=64, blank=True, null=True)
     profile_description = models.TextField('Описание профиля')
-    profile_photo = models.ImageField('Фото профиля', upload_to='profile_photos/', blank=True, null=True)
     is_active_profile = models.BooleanField('Статус активности', default=True)
 
     USERNAME_FIELD = 'email'
@@ -62,3 +62,33 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.full_name or self.email
+
+
+class UserProfilePhoto(models.Model):
+    """Фотографии профиля пользователя (до 6 шт.)."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile_photos', verbose_name='Пользователь')
+    photo = models.ImageField('Фото профиля', upload_to='profile_photos/')
+    created_at = models.DateTimeField('Дата добавления', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Фото профиля'
+        verbose_name_plural = 'Фото профилей'
+        ordering = ('-created_at',)
+
+    def clean(self):
+        super().clean()
+
+        if not self.user_id:
+            return
+
+        existing_count = self.user.profile_photos.exclude(pk=self.pk).count()
+        if existing_count >= 6:
+            raise ValidationError('Можно загрузить не более 6 фотографий профиля.')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'Фото #{self.pk or "new"} для {self.user}'
