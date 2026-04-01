@@ -24,6 +24,7 @@ class UserAdmin(DjangoUserAdmin):
                     'phone_number',
                     'telegram_username',
                     'profile_description',
+                    'profile_photo',
                     'is_active_profile',
                 )
             },

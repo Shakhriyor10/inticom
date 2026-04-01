@@ -48,6 +48,7 @@ class User(AbstractUser):
     phone_number = models.CharField('Номер телефона', max_length=20, blank=True, null=True)
     telegram_username = models.CharField('Telegram username', max_length=64, blank=True, null=True)
     profile_description = models.TextField('Описание профиля')
+    profile_photo = models.ImageField('Фото профиля', upload_to='profile_photos/', blank=True, null=True)
     is_active_profile = models.BooleanField('Статус активности', default=True)
 
     USERNAME_FIELD = 'email'
