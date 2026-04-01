@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Мой профиль</h2>
+    {% if profile %}
+        <p><b>{{ profile.name }}</b>, {{ profile.age }}</p>
+        <p>{{ profile.description }}</p>
+        <a class="btn" href="{% url 'edit_profile' %}">Редактировать анкету</a>
+    {% else %}
+        <p>У вас пока нет анкеты.</p>
+        <a class="btn" href="{% url 'edit_profile' %}">Создать анкету</a>
+    {% endif %}
+</div>
+{% endblock %}

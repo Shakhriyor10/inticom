@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>{% if profile %}Редактирование{% else %}Создание{% endif %} анкеты</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form-row">
+            <label for="photos">Фото (до 5)</label>
+            <input type="file" name="photos" id="photos" multiple accept="image/*">
+        </div>
+        <button class="btn" type="submit">Сохранить</button>
+    </form>
+
+    {% if profile and profile.photos.all %}
+        <h3>Текущие фото</h3>
+        <div class="photos">
+            {% for photo in profile.photos.all %}
+                <div>
+                    <img src="{{ photo.image.url }}" alt="Фото">
+                    <form method="post" action="{% url 'delete_photo' photo.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Удалить</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
