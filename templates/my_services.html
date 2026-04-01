@@ -42,7 +42,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="action" value="add_service">
                         {% for field in service_form %}
-                            <div class="col-md-6">
+                            <div class="{% if field.name == 'service_options' %}col-12{% else %}col-md-6{% endif %}">
                                 <label class="form-label">{{ field.label }}</label>
                                 {{ field }}
                                 {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
