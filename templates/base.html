@@ -10,6 +10,13 @@
         header a { color: #fff; margin-left: 14px; text-decoration: none; }
         .container { max-width: 1000px; margin: 20px auto; padding: 0 16px; }
         .card { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .profiles-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .profile-card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); }
+        .profile-photo-wrap { background: #f3f4f6; }
+        .profile-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+        .profile-photo-placeholder { display: flex; align-items: center; justify-content: center; color: #6b7280; font-weight: 600; }
+        .profile-meta { padding: 12px 14px 14px; }
+        .profile-meta p { margin: 6px 0; }
         .photos { display: flex; gap: 8px; flex-wrap: wrap; }
         .photos img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; }
         .form-row { margin-bottom: 10px; }
@@ -18,6 +25,8 @@
         .errorlist { color: #dc2626; }
         .messages { list-style: none; padding: 0; }
         .messages li { background: #dcfce7; color: #166534; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+        @media (max-width: 900px) { .profiles-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 640px) { .profiles-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>

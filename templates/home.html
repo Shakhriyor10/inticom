@@ -2,21 +2,26 @@
 
 {% block content %}
 <h1>Анкеты</h1>
-{% for profile in profiles %}
-    <div class="card">
-        <h3>{{ profile.name }}, {{ profile.age }}</h3>
-        <p><b>Пол:</b> {{ profile.get_gender_display }} | <b>Рост:</b> {{ profile.height }} см | <b>Вес:</b> {{ profile.weight }} кг</p>
-        <p><b>Тип:</b> {{ profile.get_profile_type_display }} {% if profile.breast_size %}| <b>Размер груди:</b> {{ profile.breast_size }}{% endif %}</p>
-        <p>{{ profile.description }}</p>
-        <div class="photos">
-            {% for photo in profile.photos.all %}
-                <img src="{{ photo.image.url }}" alt="Фото {{ profile.name }}">
-            {% empty %}
-                <p>Фото пока нет.</p>
-            {% endfor %}
-        </div>
-    </div>
-{% empty %}
-    <p>Пока нет анкет.</p>
-{% endfor %}
+<div class="profiles-grid">
+    {% for profile in profiles %}
+        <article class="profile-card">
+            <div class="profile-photo-wrap">
+                {% with first_photo=profile.photos.first %}
+                    {% if first_photo %}
+                        <img class="profile-photo" src="{{ first_photo.image.url }}" alt="Фото {{ profile.name }}">
+                    {% else %}
+                        <div class="profile-photo profile-photo-placeholder">Нет фото</div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <div class="profile-meta">
+                <p><b>Имя:</b> {{ profile.name }}</p>
+                <p><b>Возраст:</b> {{ profile.age }}</p>
+                <p><b>Размер груди:</b> {{ profile.breast_size|default:'Не указан' }}</p>
+            </div>
+        </article>
+    {% empty %}
+        <p>Пока нет анкет.</p>
+    {% endfor %}
+</div>
 {% endblock %}
