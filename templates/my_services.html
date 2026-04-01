@@ -20,10 +20,27 @@
             <div class="card-body">
                 <h1 class="h3 page-title">Мои услуги</h1>
                 {% if profile %}
-                    <p class="muted">Выберите услугу из справочника (добавляет главный администратор) и укажите цены.</p>
+                    <p class="muted">Выберите услугу из справочника. Цены теперь задаются один раз для всей анкеты.</p>
+
+
+                    <form method="post" class="row g-3 mb-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="save_prices">
+                        {% for field in price_form %}
+                            <div class="col-md-4">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                            </div>
+                        {% endfor %}
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary" type="submit">Сохранить цены анкеты</button>
+                        </div>
+                    </form>
 
                     <form method="post" class="row g-3">
                         {% csrf_token %}
+                        <input type="hidden" name="action" value="add_service">
                         {% for field in service_form %}
                             <div class="col-md-6">
                                 <label class="form-label">{{ field.label }}</label>
@@ -53,9 +70,6 @@
                                 <tr>
                                     <th>Услуга</th>
                                     <th>Описание</th>
-                                    <th>1 час</th>
-                                    <th>2 часа</th>
-                                    <th>Ночь</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -63,9 +77,6 @@
                                     <tr>
                                         <td>{{ service.service_option.title }}</td>
                                         <td>{{ service.description|default:service.service_option.description|default:'—' }}</td>
-                                        <td>{{ service.price_per_hour }}</td>
-                                        <td>{{ service.price_for_two_hours }}</td>
-                                        <td>{{ service.price_for_night }}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -87,9 +98,6 @@
                                 <tr>
                                     <th>Услуга</th>
                                     <th>Описание</th>
-                                    <th>1 час</th>
-                                    <th>2 часа</th>
-                                    <th>Ночь</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -97,9 +105,6 @@
                                     <tr>
                                         <td>{{ service.service_option.title }}</td>
                                         <td>{{ service.description|default:service.service_option.description|default:'—' }}</td>
-                                        <td>{{ service.price_per_hour }}</td>
-                                        <td>{{ service.price_for_two_hours }}</td>
-                                        <td>{{ service.price_for_night }}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
