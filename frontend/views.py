@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import EmailAuthenticationForm, ProfileForm, ServiceForm, SignUpForm
-from .models import Profile, ProfilePhoto
+from .models import Profile, ProfilePhoto, Service
 
 
 def home(request):
@@ -56,11 +56,26 @@ def my_questionnaire(request):
 
 @login_required
 def my_services(request):
-    profile = Profile.objects.filter(user=request.user).prefetch_related('services').first()
-    service_form = ServiceForm()
+    profile = (
+        Profile.objects.filter(user=request.user)
+        .prefetch_related('services__service_option')
+        .first()
+    )
+    available_categories = []
+    if profile:
+        if profile.profile_type in (Profile.ProfileType.ESCORT, Profile.ProfileType.BOTH):
+            available_categories.append(Service.Category.ESCORT)
+        if profile.profile_type in (Profile.ProfileType.MASSEUSE, Profile.ProfileType.BOTH):
+            available_categories.append(Service.Category.MASSAGE)
+
+    service_form = ServiceForm(profile=profile, available_categories=available_categories)
 
     if request.method == 'POST' and profile:
-        service_form = ServiceForm(request.POST)
+        service_form = ServiceForm(
+            request.POST,
+            profile=profile,
+            available_categories=available_categories,
+        )
         if service_form.is_valid():
             service = service_form.save(commit=False)
             service.profile = profile
@@ -68,8 +83,12 @@ def my_services(request):
             messages.success(request, 'Услуга добавлена.')
             return redirect('my_services')
 
-    escort_services = profile.services.filter(category='escort') if profile else []
-    massage_services = profile.services.filter(category='massage') if profile else []
+    escort_services = (
+        profile.services.filter(service_option__category=Service.Category.ESCORT) if profile else []
+    )
+    massage_services = (
+        profile.services.filter(service_option__category=Service.Category.MASSAGE) if profile else []
+    )
 
     return render(
         request,

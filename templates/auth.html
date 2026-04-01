@@ -1,29 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card" style="max-width: 520px; margin: 0 auto;">
-    <h2 class="section-title" style="font-size: 30px;">Вход / Регистрация</h2>
-    <p class="section-subtitle">Выберите режим и заполните форму.</p>
+<div class="card soft-card mx-auto" style="max-width: 560px;">
+    <div class="card-body">
+        <h1 class="h3 page-title">Вход / Регистрация</h1>
+        <p class="muted">Выберите режим и заполните форму.</p>
 
-    <p>
-        <a class="btn btn-secondary" href="?mode=login">Войти</a>
-        <a class="btn btn-secondary" href="?mode=signup">Регистрация</a>
-    </p>
+        <div class="btn-group mb-3" role="group">
+            <a class="btn btn-outline-secondary {% if mode == 'login' %}active{% endif %}" href="?mode=login">Войти</a>
+            <a class="btn btn-outline-secondary {% if mode == 'signup' %}active{% endif %}" href="?mode=signup">Регистрация</a>
+        </div>
 
-    {% if mode == 'signup' %}
-        <form method="post" class="form-grid">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="signup">
-            {{ signup_form.as_p }}
-            <button class="btn" type="submit">Зарегистрироваться</button>
-        </form>
-    {% else %}
-        <form method="post" class="form-grid">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="login">
-            {{ login_form.as_p }}
-            <button class="btn" type="submit">Войти</button>
-        </form>
-    {% endif %}
+        {% if mode == 'signup' %}
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="signup">
+                {% for field in signup_form %}
+                    <div class="col-12">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                <div class="col-12"><button class="btn btn-primary" type="submit">Зарегистрироваться</button></div>
+            </form>
+        {% else %}
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="login">
+                {% for field in login_form %}
+                    <div class="col-12">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                <div class="col-12"><button class="btn btn-primary" type="submit">Войти</button></div>
+            </form>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
