@@ -1,33 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card soft-card mb-4">
-    <div class="card-body">
-        <h1 class="h3 page-title">Анкеты</h1>
-        <p class="muted mb-0">Каталог пользователей.</p>
-    </div>
-</div>
 
 <div class="row g-3">
     {% for profile in profiles %}
         <div class="col-sm-6 col-lg-4 col-xl-3">
             <article class="card soft-card h-100 overflow-hidden">
-                {% with first_photo=profile.photos.first %}
-                    {% if first_photo %}
-                        <img class="profile-image" src="{{ first_photo.image.url }}" alt="Фото {{ profile.name }}">
-                    {% else %}
-                        <div class="profile-placeholder">Нет фото</div>
-                    {% endif %}
-                {% endwith %}
+                <a href="{% url 'profile_detail' profile.id %}" class="text-decoration-none">
+                    {% with first_photo=profile.photos.first %}
+                        {% if first_photo %}
+                            <img class="profile-image" src="{{ first_photo.image.url }}" alt="Фото {{ profile.name }}">
+                        {% else %}
+                            <div class="profile-placeholder">Нет фото</div>
+                        {% endif %}
+                    {% endwith %}
+                </a>
                 <div class="card-body">
-                    <p class="mb-1"><b>{{ profile.name }}</b>, {{ profile.age }}</p>
-                    <p class="text-muted mb-2">{{ profile.get_profile_type_display }}</p>
-                    <p class="text-muted mb-2">{{ profile.description|truncatechars:70 }}</p>
+                    <p class="mb-1"><a class="profile-name-link" href="{% url 'profile_detail' profile.id %}"><b>{{ profile.name }}</b></a>, {{ profile.age }}</p>
+<!--                    <p class="text-muted mb-2">{{ profile.get_profile_type_display }}</p>-->
+<!--                    <p class="text-muted mb-2">{{ profile.description|truncatechars:70 }}</p>-->
                     <div class="small">
-                        <div><b>1 час:</b> {{ profile.price_per_hour|default:'—' }}</div>
-                        <div><b>2 часа:</b> {{ profile.price_for_two_hours|default:'—' }}</div>
-                        <div><b>Ночь:</b> {{ profile.price_for_night|default:'—' }}</div>
+                        <div><b>1 час:</b> {{ profile.price_per_hour|default:'—' }} сум</div>
+                        <div><b>2 часа:</b> {{ profile.price_for_two_hours|default:'—' }} сум</div>
+                        <div><b>Ночь:</b> {{ profile.price_for_night|default:'—' }} сум</div>
                     </div>
+                    <a href="{% url 'profile_detail' profile.id %}" class="btn btn-gradient btn-sm mt-3">Подробнее</a>
                 </div>
             </article>
         </div>

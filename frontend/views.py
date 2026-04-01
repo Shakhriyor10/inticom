@@ -11,6 +11,23 @@ def home(request):
     profiles = Profile.objects.prefetch_related('photos').order_by('-created_at')
     return render(request, 'home.html', {'profiles': profiles})
 
+def profile_detail(request, profile_id):
+    profile = get_object_or_404(
+        Profile.objects.prefetch_related('photos', 'services__service_option'),
+        id=profile_id,
+    )
+    escort_services = profile.services.filter(service_option__category=Service.Category.ESCORT)
+    massage_services = profile.services.filter(service_option__category=Service.Category.MASSAGE)
+    return render(
+        request,
+        'profile_detail.html',
+        {
+            'profile': profile,
+            'escort_services': escort_services,
+            'massage_services': massage_services,
+        },
+    )
+
 
 def auth_page(request):
     mode = request.GET.get('mode', 'login')
