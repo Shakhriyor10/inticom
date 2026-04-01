@@ -104,10 +104,19 @@ def my_services(request):
                 available_categories=available_categories,
             )
             if service_form.is_valid():
-                service = service_form.save(commit=False)
-                service.profile = profile
-                service.save()
-                messages.success(request, 'Услуга добавлена.')
+                selected_options = service_form.cleaned_data['service_options']
+                description = service_form.cleaned_data['description']
+                Service.objects.bulk_create(
+                    [
+                        Service(
+                            profile=profile,
+                            service_option=service_option,
+                            description=description,
+                        )
+                        for service_option in selected_options
+                    ]
+                )
+                messages.success(request, 'Услуги добавлены.')
                 return redirect('my_services')
 
     escort_services = (
