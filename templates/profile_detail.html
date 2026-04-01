@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{% url 'home' %}" class="btn btn-outline-theme btn-sm mb-3">← Назад к анкетам</a>
+
+<div class="card soft-card mb-4 overflow-hidden">
+    <div class="card-body p-4 p-lg-5">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4 align-items-lg-start">
+            <div>
+                <h1 class="h2 page-title mb-1">{{ profile.name }}, {{ profile.age }}</h1>
+                <p class="muted mb-0">{{ profile.get_profile_type_display }}</p>
+            </div>
+            <div class="price-grid" aria-label="Цены анкеты">
+                <div class="price-card">
+                    <div class="price-label">1 час</div>
+                    <div class="price-value">{{ profile.price_per_hour|default:'—' }}</div>
+                </div>
+                <div class="price-card">
+                    <div class="price-label">2 часа</div>
+                    <div class="price-value">{{ profile.price_for_two_hours|default:'—' }}</div>
+                </div>
+                <div class="price-card">
+                    <div class="price-label">Ночь</div>
+                    <div class="price-value">{{ profile.price_for_night|default:'—' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            {% for photo in profile.photos.all %}
+                <div class="col-6 col-md-4 col-xl-3">
+                    <a
+                        href="#"
+                        data-bs-toggle="modal"
+                        data-bs-target="#photoModal{{ photo.id }}"
+                        class="detail-photo-link"
+                    >
+                        <img class="detail-photo" src="{{ photo.image.url }}" alt="Фото {{ profile.name }} {{ forloop.counter }}">
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="profile-placeholder rounded-4">Фотографии не загружены</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4"><div class="detail-info">Пол: <b>{{ profile.get_gender_display }}</b></div></div>
+            <div class="col-md-4"><div class="detail-info">Рост: <b>{{ profile.height }} см</b></div></div>
+            <div class="col-md-4"><div class="detail-info">Вес: <b>{{ profile.weight }} кг</b></div></div>
+            <div class="col-md-4"><div class="detail-info">Размер груди: <b>{{ profile.breast_size|default:'—' }}</b></div></div>
+        </div>
+
+        <div class="detail-block mb-4">
+            <h2 class="h5 mb-2">Описание</h2>
+            <p class="mb-0">{{ profile.description }}</p>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-6">
+                <div class="detail-block h-100">
+                    <h2 class="h5 mb-2">Услуги для эскорта</h2>
+                    {% for service in escort_services %}
+                        <div class="service-item">
+                            <b>{{ service.service_option.title }}</b>
+                            {% if service.description %}<div class="small text-muted">{{ service.description }}</div>{% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="muted mb-0">Нет добавленных услуг.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="detail-block h-100">
+                    <h2 class="h5 mb-2">Услуги для массажа</h2>
+                    {% for service in massage_services %}
+                        <div class="service-item">
+                            <b>{{ service.service_option.title }}</b>
+                            {% if service.description %}<div class="small text-muted">{{ service.description }}</div>{% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="muted mb-0">Нет добавленных услуг.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for photo in profile.photos.all %}
+    <div class="modal fade" id="photoModal{{ photo.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered photo-modal-dialog">
+            <div class="modal-content photo-modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h3 class="h6 mb-0">Фото {{ profile.name }} #{{ forloop.counter }}</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body pt-2">
+                    <div class="photo-frame">
+                        <img class="photo-modal-image" src="{{ photo.image.url }}" alt="Увеличенное фото {{ profile.name }} {{ forloop.counter }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}
