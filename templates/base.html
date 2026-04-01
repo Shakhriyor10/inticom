@@ -89,12 +89,17 @@
             font-weight: 600;
         }
         .price-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(120px, 1fr));
+            display: flex;
+            flex-wrap: nowrap;
             gap: .6rem;
-            width: min(460px, 100%);
+            width: min(520px, 100%);
+            overflow-x: auto;
+            padding-bottom: .1rem;
+            scrollbar-width: thin;
         }
         .price-card {
+            flex: 1 0 0;
+            min-width: 145px;
             border: 1px solid var(--theme-card-border);
             border-radius: .85rem;
             background: #fff;
@@ -115,16 +120,15 @@
         .photo-modal-content {
             border: 1px solid var(--theme-card-border);
             border-radius: 1rem;
+            max-width: min(680px, calc(100vw - 1.5rem));
+            margin: 0 auto;
         }
         .photo-modal-image {
             width: 100%;
-            max-height: 75vh;
+            max-height: min(68vh, 620px);
             object-fit: contain;
             border-radius: .75rem;
-            background: #fff;
-        }
-        @media (max-width: 575px) {
-            .price-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+            background: #fff7fa;
         }
         .table thead th { white-space: nowrap; }
     </style>
