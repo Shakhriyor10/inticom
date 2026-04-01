@@ -61,6 +61,12 @@
             border-radius: 1rem;
             border: 1px solid var(--theme-card-border);
         }
+        .detail-photo-link { display: block; }
+        .detail-photo-link:hover .detail-photo {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(214, 51, 108, 0.2);
+        }
+        .detail-photo { transition: .2s ease; }
         .detail-info, .detail-block {
             border: 1px solid var(--theme-card-border);
             border-radius: .9rem;
@@ -81,6 +87,44 @@
             padding: .35rem .75rem;
             font-size: .9rem;
             font-weight: 600;
+        }
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(120px, 1fr));
+            gap: .6rem;
+            width: min(460px, 100%);
+        }
+        .price-card {
+            border: 1px solid var(--theme-card-border);
+            border-radius: .85rem;
+            background: #fff;
+            padding: .55rem .7rem;
+            text-align: center;
+        }
+        .price-label {
+            font-size: .8rem;
+            color: var(--theme-muted);
+            margin-bottom: .15rem;
+        }
+        .price-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--theme-primary-deep);
+            line-height: 1.2;
+        }
+        .photo-modal-content {
+            border: 1px solid var(--theme-card-border);
+            border-radius: 1rem;
+        }
+        .photo-modal-image {
+            width: 100%;
+            max-height: 75vh;
+            object-fit: contain;
+            border-radius: .75rem;
+            background: #fff;
+        }
+        @media (max-width: 575px) {
+            .price-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
         }
         .table thead th { white-space: nowrap; }
     </style>
