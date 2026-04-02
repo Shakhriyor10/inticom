@@ -45,7 +45,10 @@ class SignUpForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
+        for field_name, field in self.fields.items():
+            if field_name in ('outcall_available', 'incall_available'):
+                field.widget.attrs['class'] = 'form-check-input'
+                continue
             field.widget.attrs['class'] = 'form-control'
 
     class Meta:
@@ -58,6 +61,10 @@ class ProfileForm(forms.ModelForm):
             'weight',
             'profile_type',
             'breast_size',
+            'phone_number',
+            'telegram_username',
+            'outcall_available',
+            'incall_available',
             'description',
             'price_per_hour',
             'price_for_two_hours',
@@ -71,14 +78,36 @@ class ProfileForm(forms.ModelForm):
             'weight': 'Вес',
             'profile_type': 'Тип профиля',
             'breast_size': 'Размер груди (необязательно)',
+            'phone_number': 'Номер телефона',
+            'telegram_username': 'Telegram username',
+            'outcall_available': 'Выезд',
+            'incall_available': 'У себя',
             'description': 'Описание профиля',
             'price_per_hour': 'Общая цена за 1 час',
             'price_for_two_hours': 'Общая цена за 2 часа',
             'price_for_night': 'Общая цена за ночь',
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        phone_number = (cleaned_data.get('phone_number') or '').strip()
+        telegram_username = (cleaned_data.get('telegram_username') or '').strip().lstrip('@')
+
+        if not phone_number and not telegram_username:
+            raise forms.ValidationError('Укажите номер телефона или Telegram username.')
+
+        cleaned_data['telegram_username'] = telegram_username
+        return cleaned_data
+
 
 class ServiceForm(forms.ModelForm):
+    service_options = forms.ModelMultipleChoiceField(
+        queryset=ServiceOption.objects.none(),
+        label='Выберите услуги',
+        widget=forms.CheckboxSelectMultiple,
+        required=True,
+    )
+
     def __init__(self, *args, **kwargs):
         available_categories = kwargs.pop('available_categories', [])
         profile = kwargs.pop('profile', None)
@@ -87,22 +116,20 @@ class ServiceForm(forms.ModelForm):
         queryset = ServiceOption.objects.filter(is_active=True, category__in=available_categories)
         if profile:
             queryset = queryset.exclude(profile_services__profile=profile)
-        self.fields['service_option'].queryset = queryset.distinct()
+        self.fields['service_options'].queryset = queryset.distinct()
 
         for field_name, field in self.fields.items():
             css_class = 'form-control'
-            if field_name == 'service_option':
-                css_class = 'form-select'
+            if field_name == 'service_options':
+                continue
             field.widget.attrs['class'] = css_class
 
     class Meta:
         model = Service
         fields = [
-            'service_option',
             'description',
         ]
         labels = {
-            'service_option': 'Выберите услугу',
             'description': 'Комментарий',
         }
 

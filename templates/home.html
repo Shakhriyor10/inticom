@@ -17,6 +17,23 @@
                 </a>
                 <div class="card-body">
                     <p class="mb-1"><a class="profile-name-link" href="{% url 'profile_detail' profile.id %}"><b>{{ profile.name }}</b></a>, {{ profile.age }}</p>
+                    <p class="small text-muted mb-2">
+                        {% if profile.phone_number %}
+                            📞 {{ profile.phone_number }}
+                        {% elif profile.telegram_username %}
+                            Telegram: @{{ profile.telegram_username }}
+                        {% else %}
+                            Контакт не указан
+                        {% endif %}
+                    </p>
+                                        <p class="small text-muted mb-2">
+                        Рост: {{ profile.height }} см · Вес: {{ profile.weight }} кг
+                    </p>
+                    <p class="small mb-2">
+                        {% if profile.outcall_available %}<span class="badge text-bg-light">Выезд</span>{% endif %}
+                        {% if profile.incall_available %}<span class="badge text-bg-light">У себя</span>{% endif %}
+                    </p>
+
 <!--                    <p class="text-muted mb-2">{{ profile.get_profile_type_display }}</p>-->
 <!--                    <p class="text-muted mb-2">{{ profile.description|truncatechars:70 }}</p>-->
                     <div class="small">
