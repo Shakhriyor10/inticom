@@ -9,9 +9,9 @@
         <form method="post" enctype="multipart/form-data" class="row g-3">
             {% csrf_token %}
             {% for field in form %}
-                <div class="{% if field.name == 'description' %}col-12{% elif field.name == 'outcall_available' or field.name == 'incall_available' %}col-md-6 d-flex align-items-end{% else %}col-md-6{% endif %}">
+                <div class="{% if field.name == 'description' %}col-12{% elif field.name == 'outcall_available' or field.name == 'incall_available' or field.name == 'is_hot' %}col-md-6 d-flex align-items-end{% else %}col-md-6{% endif %}">
                     <label class="form-label">{{ field.label }}</label>
-                    {% if field.name == 'outcall_available' or field.name == 'incall_available' %}
+                    {% if field.name == 'outcall_available' or field.name == 'incall_available' or field.name == 'is_hot' %}
                         <div class="form-check ms-2 mb-2">
                             {{ field }}
                         </div>

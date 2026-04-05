@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, ProfilePhoto, Service, ServiceOption
+from .models import Profile, ProfilePhoto, ProfileReview, Service, ServiceOption
 
 
 class ProfilePhotoInline(admin.TabularInline):
@@ -10,7 +10,19 @@ class ProfilePhotoInline(admin.TabularInline):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'age', 'profile_type', 'price_per_hour', 'price_for_two_hours', 'price_for_night', 'created_at')
+    list_display = (
+        'name',
+        'user',
+        'age',
+        'profile_type',
+        'is_hot',
+        'hot_until',
+        'price_per_hour',
+        'price_for_two_hours',
+        'price_for_night',
+        'created_at',
+    )
+    list_filter = ('profile_type', 'is_hot')
     inlines = [ProfilePhotoInline]
 
 
@@ -31,3 +43,9 @@ class ServiceAdmin(admin.ModelAdmin):
     list_display = ('profile', 'service_option')
     list_filter = ('service_option__category',)
     search_fields = ('profile__name', 'service_option__title')
+
+
+@admin.register(ProfileReview)
+class ProfileReviewAdmin(admin.ModelAdmin):
+    list_display = ('profile', 'author', 'created_at')
+    search_fields = ('profile__name', 'author__username', 'comment')

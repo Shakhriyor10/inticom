@@ -1,10 +1,19 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
+from django.db.models.functions import Abs
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EmailAuthenticationForm, ProfileForm, ProfilePriceForm, ServiceForm, SignUpForm
-from .models import Profile, ProfilePhoto, Service
+from .forms import (
+    EmailAuthenticationForm,
+    ProfileForm,
+    ProfilePriceForm,
+    ProfileReviewForm,
+    ServiceForm,
+    SignUpForm,
+)
+from .models import Profile, ProfilePhoto, ProfileReview, Service
 
 
 def home(request):
@@ -17,7 +26,8 @@ def home(request):
     if visible_count < default_page_size:
         visible_count = default_page_size
 
-    profiles_qs = Profile.objects.prefetch_related('photos').order_by('-created_at')
+    Profile.deactivate_expired_hot_status()
+    profiles_qs = Profile.objects.prefetch_related('photos').order_by('-is_hot', '-created_at')
     profiles = profiles_qs[:visible_count]
     has_more = profiles_qs.count() > visible_count
 
@@ -33,12 +43,48 @@ def home(request):
     )
 
 def profile_detail(request, profile_id):
+    Profile.deactivate_expired_hot_status()
     profile = get_object_or_404(
         Profile.objects.prefetch_related('photos', 'services__service_option'),
         id=profile_id,
     )
+    review_form = ProfileReviewForm()
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, 'Только зарегистрированные пользователи могут оставлять отзывы.')
+            return redirect('auth_page')
+
+        target_profile_id = request.POST.get('target_profile_id')
+        target_profile = get_object_or_404(Profile, id=target_profile_id)
+        review_form = ProfileReviewForm(request.POST)
+        if review_form.is_valid():
+            ProfileReview.objects.create(
+                profile=target_profile,
+                author=request.user,
+                comment=review_form.cleaned_data['comment'],
+            )
+            messages.success(request, f'Отзыв для анкеты "{target_profile.name}" сохранен.')
+            return redirect('profile_detail', profile_id=profile_id)
+
     escort_services = profile.services.filter(service_option__category=Service.Category.ESCORT)
     massage_services = profile.services.filter(service_option__category=Service.Category.MASSAGE)
+    similar_profiles = (
+        Profile.objects.filter(
+            height__gte=profile.height - 15,
+            height__lte=profile.height + 15,
+            weight__gte=profile.weight - 5,
+            weight__lte=profile.weight + 5,
+        )
+        .exclude(id=profile.id)
+        .prefetch_related('photos', 'reviews')
+        .annotate(
+            weight_diff=Abs(F('weight') - profile.weight),
+            height_diff=Abs(F('height') - profile.height),
+        )
+        .annotate(match_score=F('weight_diff') + F('height_diff'))
+        .order_by('match_score', 'weight_diff', 'height_diff', '-is_hot', '-created_at')[:8]
+    )
+
     return render(
         request,
         'profile_detail.html',
@@ -46,6 +92,8 @@ def profile_detail(request, profile_id):
             'profile': profile,
             'escort_services': escort_services,
             'massage_services': massage_services,
+            'similar_profiles': similar_profiles,
+            'review_form': review_form,
         },
     )
 

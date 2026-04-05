@@ -48,6 +48,20 @@
         border: 1px solid var(--theme-card-border);
         background: #fff;
     }
+    .gallery-main-wrap { position: relative; }
+    .vip-badge {
+        position: absolute;
+        top: .65rem;
+        right: .65rem;
+        z-index: 3;
+        background: linear-gradient(135deg, #ff7a00, #ff2a6d);
+        color: #fff;
+        font-weight: 700;
+        border-radius: 999px;
+        font-size: .74rem;
+        padding: .22rem .62rem;
+        letter-spacing: .02em;
+    }
     .contact-list {
         display: grid;
         gap: .5rem;
@@ -127,11 +141,16 @@
                                 >
                             {% endfor %}
                         </div>
-                        {% for photo in profile.photos.all %}
-                            {% if forloop.first %}
-                                <img id="gallery-main-image" class="gallery-main" src="{{ photo.image.url }}" alt="Главное фото {{ profile.name }}">
+                        <div class="gallery-main-wrap">
+                            {% if profile.is_hot_active %}
+                                <span class="vip-badge">VIP</span>
                             {% endif %}
-                        {% endfor %}
+                            {% for photo in profile.photos.all %}
+                                {% if forloop.first %}
+                                    <img id="gallery-main-image" class="gallery-main" src="{{ photo.image.url }}" alt="Главное фото {{ profile.name }}">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                 {% else %}
                     <div class="profile-placeholder rounded-4">Фотографии не загружены</div>
@@ -216,6 +235,55 @@
                 {% endif %}
             </div>
         {% endif %}
+
+        <div class="mt-4">
+            <h2 class="h4 mb-3">Похожие анкеты</h2>
+            <div class="row g-3">
+                {% for similar in similar_profiles %}
+                    <div class="col-md-6 col-xl-3">
+                        <article class="card h-100">
+                            <div class="card-body">
+                                <p class="mb-2"><a href="{% url 'profile_detail' similar.id %}" class="profile-name-link"><b>{{ similar.name }}</b></a>, {{ similar.age }}</p>
+                                <p class="small text-muted mb-2">Рост: {{ similar.height }} см · Вес: {{ similar.weight }} кг</p>
+                                <p class="small text-muted mb-2">Совпадение: {{ similar.match_score }}</p>
+                                <a href="{% url 'profile_detail' similar.id %}" class="btn btn-outline-theme btn-sm mb-3">Открыть</a>
+
+                                {% with reviews=similar.reviews.all|slice:":3" %}
+                                    <div class="small mb-2"><b>Отзывы</b></div>
+                                    {% if reviews %}
+                                        {% for review in reviews %}
+                                            <div class="small border rounded p-2 mb-2">
+                                                <div class="fw-semibold">{{ review.author.username }}</div>
+                                                <div>{{ review.comment }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="small text-muted mb-2">Пока нет отзывов.</div>
+                                    {% endif %}
+                                {% endwith %}
+
+                                {% if request.user.is_authenticated %}
+                                    <form method="post" class="mt-2">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="target_profile_id" value="{{ similar.id }}">
+                                        {{ review_form.comment }}
+                                        <button type="submit" class="btn btn-gradient btn-sm mt-2">Оставить отзыв</button>
+                                    </form>
+                                {% else %}
+                                    <div class="small text-muted">
+                                        Чтобы оставить отзыв, <a href="{% url 'auth_page' %}?mode=login">войдите</a>.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </article>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-secondary mb-0">Похожие анкеты пока не найдены.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 
