@@ -117,6 +117,13 @@
             flex: 0 0 74px;
             scroll-snap-align: start;
         }
+        .similar-grid { --bs-gutter-x: .6rem; --bs-gutter-y: .6rem; }
+        .similar-card .profile-image,
+        .similar-card .profile-placeholder { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+        .similar-card .card-body { padding: .6rem; }
+        .similar-card .profile-name-line { font-size: .9rem; line-height: 1.2; margin-bottom: .35rem !important; }
+        .similar-card .small { font-size: .73rem; margin-bottom: .35rem !important; }
+        .similar-card .btn { padding: .25rem .55rem; margin-bottom: 0 !important; }
     }
 </style>
 
@@ -247,10 +254,10 @@
 
         <div class="mt-4">
             <h2 class="h4 mb-3">Похожие анкеты</h2>
-            <div class="row g-3">
+            <div class="row g-3 similar-grid">
                 {% for similar in similar_profiles %}
-                    <div class="col-md-6 col-xl-3">
-                        <article class="card h-100">
+                    <div class="col-6 col-md-6 col-xl-3">
+                        <article class="card h-100 similar-card">
                             {% with first_photo=similar.photos.first %}
                                 {% if first_photo %}
                                     <img class="profile-image" src="{{ first_photo.image.url }}" alt="Фото {{ similar.name }}">
@@ -259,7 +266,7 @@
                                 {% endif %}
                             {% endwith %}
                             <div class="card-body">
-                                <p class="mb-2"><a href="{% url 'profile_detail' similar.id %}" class="profile-name-link"><b>{{ similar.name }}</b></a>, {{ similar.age }}</p>
+                                <p class="mb-2 profile-name-line"><a href="{% url 'profile_detail' similar.id %}" class="profile-name-link"><b>{{ similar.name }}</b></a>, {{ similar.age }}</p>
                                 <p class="small text-muted mb-2">Рост: {{ similar.height }} см · Вес: {{ similar.weight }} кг</p>
                                 <p class="small text-muted mb-2">Совпадение: {{ similar.match_score }}</p>
                                 <a href="{% url 'profile_detail' similar.id %}" class="btn btn-outline-theme btn-sm mb-3">Открыть</a>
