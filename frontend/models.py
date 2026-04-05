@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 
 class Profile(models.Model):
@@ -30,11 +31,29 @@ class Profile(models.Model):
     price_per_hour = models.PositiveIntegerField('Цена анкеты за 1 час', null=True, blank=True)
     price_for_two_hours = models.PositiveIntegerField('Цена анкеты за 2 часа', null=True, blank=True)
     price_for_night = models.PositiveIntegerField('Цена анкеты за ночь', null=True, blank=True)
+    is_hot = models.BooleanField(default=False, verbose_name='VIP/Топ анкета')
+    hot_until = models.DateField(null=True, blank=True, verbose_name='VIP активен до')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return f'{self.name} ({self.user.email})'
+
+    @property
+    def is_hot_active(self) -> bool:
+        if not self.is_hot:
+            return False
+        if self.hot_until and self.hot_until < timezone.localdate():
+            return False
+        return True
+
+    @classmethod
+    def deactivate_expired_hot_status(cls) -> None:
+        cls.objects.filter(
+            is_hot=True,
+            hot_until__isnull=False,
+            hot_until__lt=timezone.localdate(),
+        ).update(is_hot=False)
 
 
 class ProfilePhoto(models.Model):
@@ -92,3 +111,18 @@ class ServiceOption(models.Model):
 
     def __str__(self) -> str:
         return f'{self.title} ({self.get_category_display()})'
+
+
+class ProfileReview(models.Model):
+    profile = models.ForeignKey(Profile, related_name='reviews', on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='profile_reviews', on_delete=models.CASCADE)
+    comment = models.TextField('Комментарий')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+        verbose_name = 'Отзыв к анкете'
+        verbose_name_plural = 'Отзывы к анкетам'
+
+    def __str__(self) -> str:
+        return f'Отзыв для {self.profile.name} от {self.author}'

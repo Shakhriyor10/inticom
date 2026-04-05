@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Profile, Service, ServiceOption
+from .models import Profile, ProfileReview, Service, ServiceOption
 
 
 class EmailAuthenticationForm(AuthenticationForm):
@@ -46,7 +46,7 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            if field_name in ('outcall_available', 'incall_available'):
+            if field_name in ('outcall_available', 'incall_available', 'is_hot'):
                 field.widget.attrs['class'] = 'form-check-input'
                 continue
             field.widget.attrs['class'] = 'form-control'
@@ -69,6 +69,8 @@ class ProfileForm(forms.ModelForm):
             'price_per_hour',
             'price_for_two_hours',
             'price_for_night',
+            'is_hot',
+            'hot_until',
         ]
         labels = {
             'name': 'Имя',
@@ -86,6 +88,8 @@ class ProfileForm(forms.ModelForm):
             'price_per_hour': 'Общая цена за 1 час',
             'price_for_two_hours': 'Общая цена за 2 часа',
             'price_for_night': 'Общая цена за ночь',
+            'is_hot': 'Поднять в топ (VIP)',
+            'hot_until': 'VIP активен до',
         }
 
     def clean(self):
@@ -146,4 +150,20 @@ class ProfilePriceForm(forms.ModelForm):
             'price_per_hour': 'Общая цена за 1 час',
             'price_for_two_hours': 'Общая цена за 2 часа',
             'price_for_night': 'Общая цена за ночь',
+        }
+
+
+class ProfileReviewForm(forms.ModelForm):
+    class Meta:
+        model = ProfileReview
+        fields = ['comment']
+        labels = {'comment': 'Комментарий'}
+        widgets = {
+            'comment': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': 2,
+                    'placeholder': 'Оставьте ваш отзыв...',
+                }
+            ),
         }

@@ -1,12 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    .image-wrap { position: relative; }
+    .vip-badge {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+        z-index: 2;
+        background: linear-gradient(135deg, #ff7a00, #ff2a6d);
+        color: #fff;
+        font-weight: 700;
+        border-radius: 999px;
+        font-size: .72rem;
+        padding: .22rem .55rem;
+        letter-spacing: .02em;
+    }
+</style>
 
 <div class="row g-3">
     {% for profile in profiles %}
         <div class="col-sm-6 col-lg-4 col-xl-3">
             <article class="card soft-card h-100 overflow-hidden">
-                <a href="{% url 'profile_detail' profile.id %}" class="text-decoration-none">
+                <a href="{% url 'profile_detail' profile.id %}" class="text-decoration-none image-wrap d-block">
+                    {% if profile.is_hot_active %}
+                        <span class="vip-badge">VIP</span>
+                    {% endif %}
                     {% with first_photo=profile.photos.first %}
                         {% if first_photo %}
                             <img class="profile-image" src="{{ first_photo.image.url }}" alt="Фото {{ profile.name }}">
