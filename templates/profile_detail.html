@@ -186,34 +186,36 @@
             </div>
         </div>
 
-        <div class="row g-3">
-            <div class="col-lg-6">
-                <div class="detail-block h-100">
-                    <h2 class="h5 mb-2">Услуги для эскорта</h2>
-                    {% for service in escort_services %}
-                        <div class="service-item">
-                            <b>{{ service.service_option.title }}</b>
-                            {% if service.description %}<div class="small text-muted">{{ service.description }}</div>{% endif %}
+        {% if escort_services or massage_services %}
+            <div class="row g-3">
+                {% if escort_services %}
+                    <div class="{% if massage_services %}col-lg-6{% else %}col-12{% endif %}">
+                        <div class="detail-block h-100">
+                            <h2 class="h5 mb-2">Услуги для эскорта</h2>
+                            {% for service in escort_services %}
+                                <div class="service-item">
+                                    <b>{{ service.service_option.title }}</b>
+                                    {% if service.description %}<div class="small text-muted">{{ service.description }}</div>{% endif %}
+                                </div>
+                            {% endfor %}
                         </div>
-                    {% empty %}
-                        <p class="muted mb-0">Нет добавленных услуг.</p>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="detail-block h-100">
-                    <h2 class="h5 mb-2">Услуги для массажа</h2>
-                    {% for service in massage_services %}
-                        <div class="service-item">
-                            <b>{{ service.service_option.title }}</b>
-                            {% if service.description %}<div class="small text-muted">{{ service.description }}</div>{% endif %}
+                    </div>
+                {% endif %}
+                {% if massage_services %}
+                    <div class="{% if escort_services %}col-lg-6{% else %}col-12{% endif %}">
+                        <div class="detail-block h-100">
+                            <h2 class="h5 mb-2">Услуги для массажа</h2>
+                            {% for service in massage_services %}
+                                <div class="service-item">
+                                    <b>{{ service.service_option.title }}</b>
+                                    {% if service.description %}<div class="small text-muted">{{ service.description }}</div>{% endif %}
+                                </div>
+                            {% endfor %}
                         </div>
-                    {% empty %}
-                        <p class="muted mb-0">Нет добавленных услуг.</p>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endif %}
             </div>
-        </div>
+        {% endif %}
     </div>
 </div>
 
