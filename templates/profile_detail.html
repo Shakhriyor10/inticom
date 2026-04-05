@@ -267,25 +267,35 @@
 
         <div class="mt-4">
             <h2 class="h4 mb-3">Отзывы об анкете</h2>
-            {% if profile_reviews %}
-                <div class="mb-3">
+            <div id="reviews-empty-state" class="small text-muted mb-3 {% if profile_reviews %}d-none{% endif %}">Пока нет отзывов.</div>
+            <div id="reviews-list" class="mb-3">
+                {% if profile_reviews %}
                     {% for review in profile_reviews %}
-                        <div class="small border rounded p-2 mb-2">
-                            <div class="fw-semibold">{{ review.author.username }}</div>
-                            <div>{{ review.comment }}</div>
-                        </div>
+                        {% include 'partials/review_item.html' with review=review %}
                     {% endfor %}
-                </div>
-            {% else %}
-                <div class="small text-muted mb-3">Пока нет отзывов.</div>
+                {% endif %}
+            </div>
+
+            {% if has_more_reviews %}
+                <button
+                    id="load-more-reviews"
+                    type="button"
+                    class="btn btn-outline-theme btn-sm mb-3"
+                    data-next-offset="{{ review_page_size }}"
+                    data-page-size="{{ review_page_size }}"
+                    data-url="{% url 'profile_reviews_chunk' profile.id %}"
+                >
+                    Показать ещё
+                </button>
             {% endif %}
 
             {% if request.user.is_authenticated %}
-                <form method="post" class="mt-2">
+                <form id="review-form" method="post" class="mt-2" data-url="{% url 'create_profile_review' profile.id %}">
                     {% csrf_token %}
                     {{ review_form.comment }}
                     <button type="submit" class="btn btn-gradient btn-sm mt-2">Оставить отзыв</button>
                 </form>
+                <div id="review-form-error" class="small text-danger mt-2 d-none"></div>
             {% else %}
                 <div class="small text-muted">
                     Оставлять комментарии могут только авторизованные пользователи. <a href="{% url 'auth_page' %}?mode=login">Войти</a>.
@@ -309,6 +319,100 @@
                 thumb.classList.add('active');
             });
         });
+    })();
+
+    (function () {
+        const reviewForm = document.getElementById('review-form');
+        const reviewsList = document.getElementById('reviews-list');
+        const emptyState = document.getElementById('reviews-empty-state');
+        const loadMoreBtn = document.getElementById('load-more-reviews');
+        const errorBox = document.getElementById('review-form-error');
+
+        function getCsrfToken() {
+            const tokenInput = reviewForm ? reviewForm.querySelector('[name=csrfmiddlewaretoken]') : null;
+            return tokenInput ? tokenInput.value : '';
+        }
+
+        async function deleteReview(reviewId) {
+            const confirmed = window.confirm('Вы точно хотите удалить комментарий?');
+            if (!confirmed) return;
+
+            const response = await fetch(`/reviews/${reviewId}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                },
+            });
+
+            if (!response.ok) {
+                window.alert('Не удалось удалить комментарий. Попробуйте снова.');
+                return;
+            }
+
+            const reviewNode = reviewsList.querySelector(`.review-item[data-review-id="${reviewId}"]`);
+            if (reviewNode) reviewNode.remove();
+
+            if (!reviewsList.querySelector('.review-item')) {
+                emptyState.classList.remove('d-none');
+            }
+        }
+
+        if (reviewsList) {
+            reviewsList.addEventListener('click', (event) => {
+                const deleteBtn = event.target.closest('.review-delete-btn');
+                if (!deleteBtn) return;
+                deleteReview(deleteBtn.dataset.reviewId);
+            });
+        }
+
+        if (reviewForm && reviewsList) {
+            reviewForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                errorBox.classList.add('d-none');
+
+                const formData = new FormData(reviewForm);
+                const response = await fetch(reviewForm.dataset.url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    errorBox.textContent = data.error || 'Не удалось сохранить комментарий.';
+                    errorBox.classList.remove('d-none');
+                    return;
+                }
+
+                reviewsList.insertAdjacentHTML('afterbegin', data.review_html);
+                emptyState.classList.add('d-none');
+                reviewForm.reset();
+            });
+        }
+
+        if (loadMoreBtn && reviewsList) {
+            loadMoreBtn.addEventListener('click', async () => {
+                const nextOffset = loadMoreBtn.dataset.nextOffset;
+                const pageSize = loadMoreBtn.dataset.pageSize;
+                const response = await fetch(`${loadMoreBtn.dataset.url}?offset=${nextOffset}&limit=${pageSize}`);
+                if (!response.ok) {
+                    window.alert('Не удалось загрузить комментарии.');
+                    return;
+                }
+
+                const data = await response.json();
+                data.items.forEach((itemHtml) => {
+                    reviewsList.insertAdjacentHTML('beforeend', itemHtml);
+                });
+
+                loadMoreBtn.dataset.nextOffset = data.next_offset;
+                if (!data.has_more) {
+                    loadMoreBtn.remove();
+                }
+            });
+        }
     })();
 </script>
 {% endblock %}
