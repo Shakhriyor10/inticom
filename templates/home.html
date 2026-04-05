@@ -51,4 +51,12 @@
         </div>
     {% endfor %}
 </div>
+
+{% if has_more %}
+    <div class="d-flex justify-content-center mt-4">
+        <a href="?count={{ visible_count|add:page_size }}" class="btn btn-outline-secondary">
+            Показать еще
+        </a>
+    </div>
+{% endif %}
 {% endblock %}
