@@ -13,6 +13,7 @@ urlpatterns = [
     path('my-profile/', views.my_profile, name='my_profile'),
     path('my-profile/questionnaire/', views.my_questionnaire, name='my_questionnaire'),
     path('my-profile/services/', views.my_services, name='my_services'),
+    path('my-profile/services/<int:service_id>/delete/', views.delete_service, name='delete_service'),
     path('profile/edit/', views.create_or_edit_profile, name='edit_profile'),
     path('profile/photo/<int:photo_id>/delete/', views.delete_photo, name='delete_photo'),
 ]

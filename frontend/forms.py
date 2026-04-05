@@ -121,6 +121,7 @@ class ServiceForm(forms.ModelForm):
         if profile:
             queryset = queryset.exclude(profile_services__profile=profile)
         self.fields['service_options'].queryset = queryset.distinct()
+        self.fields['service_options'].widget.attrs['class'] = 'service-options list-unstyled mb-0'
 
         for field_name, field in self.fields.items():
             css_class = 'form-control'

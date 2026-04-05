@@ -18,40 +18,62 @@
     <div class="col-lg-9">
         <div class="card soft-card mb-4">
             <div class="card-body">
-                <h1 class="h3 page-title">Мои услуги</h1>
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                    <div>
+                        <h1 class="h3 page-title mb-1">Мои услуги и цены</h1>
+                        <p class="muted mb-0">Все управление в одном месте: добавление, удаление и обновление цен.</p>
+                    </div>
+                    {% if profile %}
+                        <span class="badge text-bg-light border">Всего услуг: {{ services_total }}</span>
+                    {% endif %}
+                </div>
+
                 {% if profile %}
-                    <p class="muted">Выберите услугу из справочника. Цены теперь задаются один раз для всей анкеты.</p>
+                    <div class="alert alert-light border mb-4">
+                        <b>Как пользоваться:</b> сначала обновите цены анкеты, потом добавляйте услуги. Любую услугу ниже можно удалить и при необходимости добавить снова.
+                    </div>
 
-
-                    <form method="post" class="row g-3 mb-4">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="save_prices">
-                        {% for field in price_form %}
-                            <div class="col-md-4">
-                                <label class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                    <div class="row g-4">
+                        <div class="col-xl-5">
+                            <div class="detail-block h-100">
+                                <h2 class="h5 mb-3">Цены анкеты</h2>
+                                <form method="post" class="row g-3">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="save_prices">
+                                    {% for field in price_form %}
+                                        <div class="col-12">
+                                            <label class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                                        </div>
+                                    {% endfor %}
+                                    <div class="col-12">
+                                        <button class="btn btn-gradient w-100" type="submit">Сохранить цены</button>
+                                    </div>
+                                </form>
                             </div>
-                        {% endfor %}
-                        <div class="col-12">
-                            <button class="btn btn-outline-primary" type="submit">Сохранить цены анкеты</button>
                         </div>
-                    </form>
 
-                    <form method="post" class="row g-3">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="add_service">
-                        {% for field in service_form %}
-                            <div class="{% if field.name == 'service_options' %}col-12{% else %}col-md-6{% endif %}">
-                                <label class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                        <div class="col-xl-7">
+                            <div class="detail-block h-100">
+                                <h2 class="h5 mb-3">Добавить услуги</h2>
+                                <form method="post" class="row g-3">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="add_service">
+                                    {% for field in service_form %}
+                                        <div class="col-12">
+                                            <label class="form-label">{{ field.label }}</label>
+                                            {{ field }}
+                                            {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                                        </div>
+                                    {% endfor %}
+                                    <div class="col-12">
+                                        <button class="btn btn-gradient w-100" type="submit">Сохранить услуги</button>
+                                    </div>
+                                </form>
                             </div>
-                        {% endfor %}
-                        <div class="col-12">
-                            <button class="btn btn-primary" type="submit">Сохранить услугу</button>
                         </div>
-                    </form>
+                    </div>
                 {% else %}
                     <p>Сначала создайте анкету, чтобы добавить услуги.</p>
                     <a class="btn btn-primary" href="{% url 'edit_profile' %}">Создать анкету</a>
@@ -70,6 +92,7 @@
                                 <tr>
                                     <th>Услуга</th>
                                     <th>Описание</th>
+                                    <th class="text-end">Действия</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -77,6 +100,18 @@
                                     <tr>
                                         <td>{{ service.service_option.title }}</td>
                                         <td>{{ service.description|default:service.service_option.description|default:'—' }}</td>
+                                        <td class="text-end">
+                                            <button
+                                                class="btn btn-outline-danger btn-sm"
+                                                type="button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteServiceModal"
+                                                data-service-id="{{ service.id }}"
+                                                data-service-title="{{ service.service_option.title }}"
+                                            >
+                                                Удалить
+                                            </button>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -98,6 +133,7 @@
                                 <tr>
                                     <th>Услуга</th>
                                     <th>Описание</th>
+                                    <th class="text-end">Действия</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -105,6 +141,18 @@
                                     <tr>
                                         <td>{{ service.service_option.title }}</td>
                                         <td>{{ service.description|default:service.service_option.description|default:'—' }}</td>
+                                        <td class="text-end">
+                                            <button
+                                                class="btn btn-outline-danger btn-sm"
+                                                type="button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteServiceModal"
+                                                data-service-id="{{ service.id }}"
+                                                data-service-title="{{ service.service_option.title }}"
+                                            >
+                                                Удалить
+                                            </button>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -118,4 +166,45 @@
         {% endif %}
     </div>
 </div>
+
+{% if profile %}
+<div class="modal fade" id="deleteServiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Удалить услугу</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить услугу <b id="serviceToDeleteTitle"></b>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Отмена</button>
+                <form method="post" id="deleteServiceForm">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('deleteServiceModal');
+        if (!modal) return;
+
+        modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const serviceId = button.getAttribute('data-service-id');
+            const serviceTitle = button.getAttribute('data-service-title');
+            const form = document.getElementById('deleteServiceForm');
+            const titleNode = document.getElementById('serviceToDeleteTitle');
+
+            form.action = `/my-profile/services/${serviceId}/delete/`;
+            titleNode.textContent = serviceTitle;
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}
