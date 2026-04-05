@@ -242,38 +242,18 @@
                 {% for similar in similar_profiles %}
                     <div class="col-md-6 col-xl-3">
                         <article class="card h-100">
+                            {% with first_photo=similar.photos.first %}
+                                {% if first_photo %}
+                                    <img class="profile-image" src="{{ first_photo.image.url }}" alt="Фото {{ similar.name }}">
+                                {% else %}
+                                    <div class="profile-placeholder">Нет фото</div>
+                                {% endif %}
+                            {% endwith %}
                             <div class="card-body">
                                 <p class="mb-2"><a href="{% url 'profile_detail' similar.id %}" class="profile-name-link"><b>{{ similar.name }}</b></a>, {{ similar.age }}</p>
                                 <p class="small text-muted mb-2">Рост: {{ similar.height }} см · Вес: {{ similar.weight }} кг</p>
                                 <p class="small text-muted mb-2">Совпадение: {{ similar.match_score }}</p>
                                 <a href="{% url 'profile_detail' similar.id %}" class="btn btn-outline-theme btn-sm mb-3">Открыть</a>
-
-                                {% with reviews=similar.reviews.all|slice:":3" %}
-                                    <div class="small mb-2"><b>Отзывы</b></div>
-                                    {% if reviews %}
-                                        {% for review in reviews %}
-                                            <div class="small border rounded p-2 mb-2">
-                                                <div class="fw-semibold">{{ review.author.username }}</div>
-                                                <div>{{ review.comment }}</div>
-                                            </div>
-                                        {% endfor %}
-                                    {% else %}
-                                        <div class="small text-muted mb-2">Пока нет отзывов.</div>
-                                    {% endif %}
-                                {% endwith %}
-
-                                {% if request.user.is_authenticated %}
-                                    <form method="post" class="mt-2">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="target_profile_id" value="{{ similar.id }}">
-                                        {{ review_form.comment }}
-                                        <button type="submit" class="btn btn-gradient btn-sm mt-2">Оставить отзыв</button>
-                                    </form>
-                                {% else %}
-                                    <div class="small text-muted">
-                                        Чтобы оставить отзыв, <a href="{% url 'auth_page' %}?mode=login">войдите</a>.
-                                    </div>
-                                {% endif %}
                             </div>
                         </article>
                     </div>
@@ -283,6 +263,34 @@
                     </div>
                 {% endfor %}
             </div>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="h4 mb-3">Отзывы об анкете</h2>
+            {% if profile_reviews %}
+                <div class="mb-3">
+                    {% for review in profile_reviews %}
+                        <div class="small border rounded p-2 mb-2">
+                            <div class="fw-semibold">{{ review.author.username }}</div>
+                            <div>{{ review.comment }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="small text-muted mb-3">Пока нет отзывов.</div>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+                <form method="post" class="mt-2">
+                    {% csrf_token %}
+                    {{ review_form.comment }}
+                    <button type="submit" class="btn btn-gradient btn-sm mt-2">Оставить отзыв</button>
+                </form>
+            {% else %}
+                <div class="small text-muted">
+                    Оставлять комментарии могут только авторизованные пользователи. <a href="{% url 'auth_page' %}?mode=login">Войти</a>.
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

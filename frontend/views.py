@@ -54,16 +54,14 @@ def profile_detail(request, profile_id):
             messages.error(request, 'Только зарегистрированные пользователи могут оставлять отзывы.')
             return redirect('auth_page')
 
-        target_profile_id = request.POST.get('target_profile_id')
-        target_profile = get_object_or_404(Profile, id=target_profile_id)
         review_form = ProfileReviewForm(request.POST)
         if review_form.is_valid():
             ProfileReview.objects.create(
-                profile=target_profile,
+                profile=profile,
                 author=request.user,
                 comment=review_form.cleaned_data['comment'],
             )
-            messages.success(request, f'Отзыв для анкеты "{target_profile.name}" сохранен.')
+            messages.success(request, f'Отзыв для анкеты "{profile.name}" сохранен.')
             return redirect('profile_detail', profile_id=profile_id)
 
     escort_services = profile.services.filter(service_option__category=Service.Category.ESCORT)
@@ -94,6 +92,7 @@ def profile_detail(request, profile_id):
             'massage_services': massage_services,
             'similar_profiles': similar_profiles,
             'review_form': review_form,
+            'profile_reviews': profile.reviews.select_related('author')[:8],
         },
     )
 
