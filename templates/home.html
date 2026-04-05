@@ -3,6 +3,24 @@
 {% block content %}
 <style>
     .image-wrap { position: relative; }
+    .home-card {
+        border-radius: 1.15rem;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .home-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px rgba(214, 51, 108, 0.16);
+    }
+    .home-card .card-body {
+        padding: .9rem .95rem 1rem;
+    }
+    .home-card .price-list {
+        display: grid;
+        gap: .18rem;
+    }
+    .contact-line {
+        min-height: 1.35rem;
+    }
     .vip-badge {
         position: absolute;
         top: .5rem;
@@ -16,12 +34,53 @@
         padding: .22rem .55rem;
         letter-spacing: .02em;
     }
+    @media (max-width: 575.98px) {
+        .mobile-card-col {
+            width: 50%;
+        }
+        .home-card {
+            border-radius: .95rem;
+        }
+        .home-card .card-body {
+            padding: .65rem .65rem .8rem;
+        }
+        .home-card .profile-image,
+        .home-card .profile-placeholder {
+            aspect-ratio: 1/1.18;
+        }
+        .home-card .name-age {
+            font-size: .9rem;
+            line-height: 1.2;
+            margin-bottom: .25rem !important;
+        }
+        .home-card .small {
+            font-size: .73rem;
+            line-height: 1.25rem;
+            margin-bottom: .25rem !important;
+        }
+        .home-card .badge {
+            font-size: .64rem;
+            padding: .25rem .38rem;
+        }
+        .home-card .btn {
+            width: 100%;
+            margin-top: .45rem !important;
+            padding: .3rem .45rem;
+            font-size: .72rem;
+        }
+        .vip-badge {
+            font-size: .6rem;
+            padding: .17rem .42rem;
+            top: .4rem;
+            right: .4rem;
+        }
+    }
 </style>
 
 <div class="row g-3">
     {% for profile in profiles %}
-        <div class="col-sm-6 col-lg-4 col-xl-3">
-            <article class="card soft-card h-100 overflow-hidden">
+        <div class="col-6 col-sm-6 col-lg-4 col-xl-3 mobile-card-col">
+            <article class="card soft-card home-card h-100 overflow-hidden">
                 <a href="{% url 'profile_detail' profile.id %}" class="text-decoration-none image-wrap d-block">
                     {% if profile.is_hot_active %}
                         <span class="vip-badge">VIP</span>
@@ -35,8 +94,8 @@
                     {% endwith %}
                 </a>
                 <div class="card-body">
-                    <p class="mb-1"><a class="profile-name-link" href="{% url 'profile_detail' profile.id %}"><b>{{ profile.name }}</b></a>, {{ profile.age }}</p>
-                    <p class="small text-muted mb-2">
+                    <p class="mb-1 name-age"><a class="profile-name-link" href="{% url 'profile_detail' profile.id %}"><b>{{ profile.name }}</b></a>, {{ profile.age }}</p>
+                    <p class="small text-muted mb-2 contact-line">
                         {% if profile.phone_number %}
                             📞 {{ profile.phone_number }}
                         {% elif profile.telegram_username %}
@@ -45,7 +104,7 @@
                             Контакт не указан
                         {% endif %}
                     </p>
-                                        <p class="small text-muted mb-2">
+                    <p class="small text-muted mb-2">
                         Рост: {{ profile.height }} см · Вес: {{ profile.weight }} кг
                     </p>
                     <p class="small mb-2">
@@ -55,7 +114,7 @@
 
 <!--                    <p class="text-muted mb-2">{{ profile.get_profile_type_display }}</p>-->
 <!--                    <p class="text-muted mb-2">{{ profile.description|truncatechars:70 }}</p>-->
-                    <div class="small">
+                    <div class="small price-list">
                         <div><b>1 час:</b> {{ profile.price_per_hour|default:'—' }} сум</div>
                         <div><b>2 часа:</b> {{ profile.price_for_two_hours|default:'—' }} сум</div>
                         <div><b>Ночь:</b> {{ profile.price_for_night|default:'—' }} сум</div>
