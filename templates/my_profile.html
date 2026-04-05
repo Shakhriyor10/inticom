@@ -3,31 +3,75 @@
 {% block content %}
 <div class="card soft-card">
     <div class="card-body">
-        <h1 class="h3 page-title">Личный кабинет</h1>
-        <p class="muted">Удобная навигация по профилю, анкете и услугам.</p>
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <h1 class="h3 page-title mb-1">Мой профиль</h1>
+                <p class="muted mb-0">Единая панель управления анкетой, услугами и ценами.</p>
+            </div>
+            <a class="btn btn-outline-theme" href="{% url 'home' %}">На главную</a>
+        </div>
 
         {% if profile %}
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="detail-block h-100">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                            <h2 class="h5 mb-0">{{ profile.name }}, {{ profile.age }}</h2>
+                            <span class="badge text-bg-light border">{{ profile.get_profile_type_display }}</span>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6"><b>Рост / вес:</b> {{ profile.height }} см / {{ profile.weight }} кг</div>
+                            <div class="col-md-6"><b>Пол:</b> {{ profile.get_gender_display }}</div>
+                            <div class="col-md-6"><b>Телефон:</b> {{ profile.phone_number|default:'—' }}</div>
+                            <div class="col-md-6"><b>Telegram:</b> {% if profile.telegram_username %}@{{ profile.telegram_username }}{% else %}—{% endif %}</div>
+                        </div>
+                        <hr>
+                        <p class="mb-0"><b>Описание:</b> {{ profile.description|truncatechars:220 }}</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="detail-block h-100">
+                        <h2 class="h6 text-uppercase muted">Кратко</h2>
+                        <div class="d-grid gap-2">
+                            <div class="price-chip d-flex justify-content-between"><span>Услуги (escort)</span> <b>{{ escort_count }}</b></div>
+                            <div class="price-chip d-flex justify-content-between"><span>Услуги (massage)</span> <b>{{ massage_count }}</b></div>
+                            <div class="price-chip">1 час: {{ profile.price_per_hour|default:'не указано' }}</div>
+                            <div class="price-chip">2 часа: {{ profile.price_for_two_hours|default:'не указано' }}</div>
+                            <div class="price-chip">Ночь: {{ profile.price_for_night|default:'не указано' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <a class="card h-100 text-decoration-none soft-card" href="{% url 'my_questionnaire' %}">
                         <div class="card-body">
                             <h2 class="h5">Моя анкета</h2>
-                            <p class="text-muted mb-0">Просмотр анкеты, фотографий и редактирование.</p>
+                            <p class="text-muted mb-0">Посмотреть анкету и фото, изменить данные.</p>
                         </div>
                     </a>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <a class="card h-100 text-decoration-none soft-card" href="{% url 'my_services' %}">
                         <div class="card-body">
                             <h2 class="h5">Мои услуги</h2>
-                            <p class="text-muted mb-0">Выбор услуг из справочника и настройка цен.</p>
+                            <p class="text-muted mb-0">Добавлять/удалять услуги и обновлять цены.</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a class="card h-100 text-decoration-none soft-card" href="{% url 'profile_detail' profile.id %}">
+                        <div class="card-body">
+                            <h2 class="h5">Публичный профиль</h2>
+                            <p class="text-muted mb-0">Проверить как анкету видят посетители.</p>
                         </div>
                     </a>
                 </div>
             </div>
         {% else %}
             <p>У вас пока нет анкеты. Начните с создания профиля.</p>
-            <a class="btn btn-primary" href="{% url 'edit_profile' %}">Создать анкету</a>
+            <a class="btn btn-gradient" href="{% url 'edit_profile' %}">Создать анкету</a>
         {% endif %}
     </div>
 </div>

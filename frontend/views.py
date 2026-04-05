@@ -203,8 +203,26 @@ def logout_view(request):
 
 @login_required
 def my_profile(request):
-    profile = Profile.objects.filter(user=request.user).first()
-    return render(request, 'my_profile.html', {'profile': profile})
+    profile = (
+        Profile.objects.filter(user=request.user)
+        .prefetch_related('photos', 'services__service_option')
+        .first()
+    )
+    escort_count = 0
+    massage_count = 0
+    if profile:
+        escort_count = profile.services.filter(service_option__category=Service.Category.ESCORT).count()
+        massage_count = profile.services.filter(service_option__category=Service.Category.MASSAGE).count()
+
+    return render(
+        request,
+        'my_profile.html',
+        {
+            'profile': profile,
+            'escort_count': escort_count,
+            'massage_count': massage_count,
+        },
+    )
 
 
 @login_required
@@ -277,8 +295,18 @@ def my_services(request):
             'price_form': price_form,
             'escort_services': escort_services,
             'massage_services': massage_services,
+            'services_total': len(escort_services) + len(massage_services),
         },
     )
+
+
+@login_required
+@require_POST
+def delete_service(request, service_id):
+    service = get_object_or_404(Service, id=service_id, profile__user=request.user)
+    service.delete()
+    messages.success(request, 'Услуга удалена. Вы можете добавить ее снова в любой момент.')
+    return redirect('my_services')
 
 
 @login_required

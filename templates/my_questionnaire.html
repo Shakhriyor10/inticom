@@ -40,7 +40,10 @@
                         </div>
                     {% endif %}
 
-                    <a class="btn btn-primary" href="{% url 'edit_profile' %}">Редактировать анкету</a>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-primary" href="{% url 'edit_profile' %}">Редактировать анкету</a>
+                        <a class="btn btn-outline-theme" href="{% url 'my_services' %}">Управлять услугами и ценами</a>
+                    </div>
                 {% else %}
                     <p>У вас пока нет анкеты.</p>
                     <a class="btn btn-primary" href="{% url 'edit_profile' %}">Создать анкету</a>
