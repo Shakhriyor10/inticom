@@ -8,8 +8,29 @@ from .models import Profile, ProfilePhoto, Service
 
 
 def home(request):
-    profiles = Profile.objects.prefetch_related('photos').order_by('-created_at')
-    return render(request, 'home.html', {'profiles': profiles})
+    default_page_size = 16
+    try:
+        visible_count = int(request.GET.get('count', default_page_size))
+    except (TypeError, ValueError):
+        visible_count = default_page_size
+
+    if visible_count < default_page_size:
+        visible_count = default_page_size
+
+    profiles_qs = Profile.objects.prefetch_related('photos').order_by('-created_at')
+    profiles = profiles_qs[:visible_count]
+    has_more = profiles_qs.count() > visible_count
+
+    return render(
+        request,
+        'home.html',
+        {
+            'profiles': profiles,
+            'visible_count': visible_count,
+            'page_size': default_page_size,
+            'has_more': has_more,
+        },
+    )
 
 def profile_detail(request, profile_id):
     profile = get_object_or_404(
