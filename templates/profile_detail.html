@@ -100,13 +100,22 @@
     @media (max-width: 575.98px) {
         .gallery-wrap { grid-template-columns: 1fr; }
         .gallery-thumbs {
-            grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
-            grid-auto-flow: column;
+            display: flex;
+            flex-wrap: nowrap;
             max-height: none;
             overflow-x: auto;
             overflow-y: hidden;
             padding-bottom: .15rem;
             order: 2;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+        }
+        .gallery-thumb {
+            width: 74px;
+            min-width: 74px;
+            max-width: 74px;
+            flex: 0 0 74px;
+            scroll-snap-align: start;
         }
     }
 </style>
