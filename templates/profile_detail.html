@@ -1,6 +1,102 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    .profile-detail-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+        gap: 1.25rem;
+        align-items: start;
+    }
+    .profile-gallery {
+        border: 1px solid var(--theme-card-border);
+        border-radius: 1rem;
+        background: linear-gradient(180deg, #fff 0%, #fff8fb 100%);
+        padding: 1rem;
+    }
+    .gallery-wrap {
+        display: grid;
+        grid-template-columns: 84px minmax(0, 1fr);
+        gap: .85rem;
+        align-items: start;
+    }
+    .gallery-thumbs {
+        display: grid;
+        gap: .55rem;
+        max-height: 560px;
+        overflow: auto;
+        padding-right: .1rem;
+    }
+    .gallery-thumb {
+        width: 100%;
+        aspect-ratio: 4/5;
+        object-fit: cover;
+        border-radius: .8rem;
+        border: 2px solid transparent;
+        background: #fff;
+        cursor: pointer;
+        transition: transform .2s ease, border-color .2s ease;
+        padding: 0;
+    }
+    .gallery-thumb:hover { transform: translateY(-1px); border-color: #f6a5c4; }
+    .gallery-thumb.active { border-color: var(--theme-primary); box-shadow: 0 8px 20px rgba(214, 51, 108, .2); }
+    .gallery-main {
+        width: 100%;
+        aspect-ratio: 4/5;
+        object-fit: cover;
+        border-radius: 1rem;
+        border: 1px solid var(--theme-card-border);
+        background: #fff;
+    }
+    .contact-list {
+        display: grid;
+        gap: .5rem;
+    }
+    .contact-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        width: fit-content;
+        max-width: 100%;
+        text-decoration: none;
+        color: #8a2a4f;
+        border: 1px solid var(--theme-card-border);
+        background: #fff7fb;
+        border-radius: 999px;
+        padding: .4rem .75rem;
+        font-weight: 600;
+        transition: all .2s ease;
+    }
+    .contact-chip:hover {
+        color: #fff;
+        background: linear-gradient(135deg, var(--theme-primary) 0%, #ff4d8f 100%);
+        border-color: transparent;
+    }
+    .contact-icon {
+        width: 1.15rem;
+        height: 1.15rem;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+    .detail-right-col { display: grid; gap: .85rem; }
+
+    @media (max-width: 991.98px) {
+        .profile-detail-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 575.98px) {
+        .gallery-wrap { grid-template-columns: 1fr; }
+        .gallery-thumbs {
+            grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+            grid-auto-flow: column;
+            max-height: none;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: .15rem;
+            order: 2;
+        }
+    }
+</style>
+
 <a href="{% url 'home' %}" class="btn btn-outline-theme btn-sm mb-3">← Назад к анкетам</a>
 
 <div class="card soft-card mb-4 overflow-hidden">
@@ -17,51 +113,77 @@
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            {% for photo in profile.photos.all %}
-                <div class="col-6 col-md-4 col-xl-3">
-                    <img class="detail-photo" src="{{ photo.image.url }}" alt="Фото {{ profile.name }} {{ forloop.counter }}">
-                </div>
-            {% empty %}
-                <div class="col-12">
+        <div class="profile-detail-layout mb-4">
+            <div class="profile-gallery">
+                {% if profile.photos.all %}
+                    <div class="gallery-wrap">
+                        <div class="gallery-thumbs" id="gallery-thumbs">
+                            {% for photo in profile.photos.all %}
+                                <img
+                                    class="gallery-thumb {% if forloop.first %}active{% endif %}"
+                                    src="{{ photo.image.url }}"
+                                    alt="Миниатюра {{ forloop.counter }}"
+                                    data-full-image="{{ photo.image.url }}"
+                                >
+                            {% endfor %}
+                        </div>
+                        {% for photo in profile.photos.all %}
+                            {% if forloop.first %}
+                                <img id="gallery-main-image" class="gallery-main" src="{{ photo.image.url }}" alt="Главное фото {{ profile.name }}">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
                     <div class="profile-placeholder rounded-4">Фотографии не загружены</div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endif %}
+            </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-md-4"><div class="detail-info">Пол: <b>{{ profile.get_gender_display }}</b></div></div>
-            <div class="col-md-4"><div class="detail-info">Рост: <b>{{ profile.height }} см</b></div></div>
-            <div class="col-md-4"><div class="detail-info">Вес: <b>{{ profile.weight }} кг</b></div></div>
-            <div class="col-md-4"><div class="detail-info">Размер груди: <b>{{ profile.breast_size|default:'—' }}</b></div></div>
-            <div class="col-md-4">
-                <div class="detail-info">
-                    Контакт:
-                    <b>
-                        {% if profile.phone_number %}
-                            {{ profile.phone_number }}
-                        {% else %}
-                            @{{ profile.telegram_username }}
-                        {% endif %}
-                    </b>
+            <div class="detail-right-col">
+                <div class="row g-3">
+                    <div class="col-sm-6"><div class="detail-info">Пол: <b>{{ profile.get_gender_display }}</b></div></div>
+                    <div class="col-sm-6"><div class="detail-info">Рост: <b>{{ profile.height }} см</b></div></div>
+                    <div class="col-sm-6"><div class="detail-info">Вес: <b>{{ profile.weight }} кг</b></div></div>
+                    <div class="col-sm-6"><div class="detail-info">Размер груди: <b>{{ profile.breast_size|default:'—' }}</b></div></div>
+                    <div class="col-sm-12">
+                        <div class="detail-info">
+                            Прием:
+                            <b>
+                                {% if profile.outcall_available %}Выезд{% endif %}
+                                {% if profile.outcall_available and profile.incall_available %} / {% endif %}
+                                {% if profile.incall_available %}У себя{% endif %}
+                                {% if not profile.outcall_available and not profile.incall_available %}—{% endif %}
+                            </b>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="detail-info">
+                            <div class="mb-2"><b>Контакты</b></div>
+                            <div class="contact-list">
+                                {% if profile.phone_number %}
+                                    <a class="contact-chip" href="tel:{{ profile.phone_number }}">
+                                        <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6.54 5c.15-.45.57-.77 1.05-.81l2.22-.2c.45-.04.87.22 1.05.64l1.13 2.64c.16.36.08.79-.2 1.07l-1.28 1.28a16 16 0 0 0 4.47 4.47l1.28-1.28c.28-.28.71-.36 1.07-.2l2.64 1.13c.42.18.68.6.64 1.05l-.2 2.22c-.04.48-.36.9-.81 1.05a4.4 4.4 0 0 1-1.47.24C10.3 20 4 13.7 4 5.76c0-.5.08-1 .24-1.46z"/></svg>
+                                        <span>{{ profile.phone_number }}</span>
+                                    </a>
+                                {% endif %}
+                                {% if profile.telegram_username %}
+                                    <a class="contact-chip" href="https://t.me/{{ profile.telegram_username|cut:'@' }}" target="_blank" rel="noopener noreferrer">
+                                        <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9.04 15.48 8.9 19.4c.4 0 .58-.17.8-.38l1.92-1.84 3.98 2.91c.73.4 1.25.19 1.45-.67l2.63-12.35h.01c.24-1.11-.4-1.55-1.11-1.3L3.06 11.73c-1.07.42-1.05 1 .18 1.38l4.12 1.29 9.57-6.05c.45-.27.86-.12.52.18"/></svg>
+                                        <span>@{{ profile.telegram_username|cut:'@' }}</span>
+                                    </a>
+                                {% endif %}
+                                {% if not profile.phone_number and not profile.telegram_username %}
+                                    <span class="muted">Контактная информация не указана.</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-block">
+                    <h2 class="h5 mb-2">Описание</h2>
+                    <p class="mb-0">{{ profile.description }}</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="detail-info">
-                    Прием:
-                    <b>
-                        {% if profile.outcall_available %}Выезд{% endif %}
-                        {% if profile.outcall_available and profile.incall_available %} / {% endif %}
-                        {% if profile.incall_available %}У себя{% endif %}
-                        {% if not profile.outcall_available and not profile.incall_available %}—{% endif %}
-                    </b>
-                </div>
-            </div>
-        </div>
-
-        <div class="detail-block mb-4">
-            <h2 class="h5 mb-2">Описание</h2>
-            <p class="mb-0">{{ profile.description }}</p>
         </div>
 
         <div class="row g-3">
@@ -94,4 +216,21 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const mainImage = document.getElementById('gallery-main-image');
+        const thumbs = document.querySelectorAll('#gallery-thumbs .gallery-thumb');
+
+        if (!mainImage || !thumbs.length) return;
+
+        thumbs.forEach((thumb) => {
+            thumb.addEventListener('click', () => {
+                mainImage.src = thumb.dataset.fullImage;
+                thumbs.forEach((item) => item.classList.remove('active'));
+                thumb.classList.add('active');
+            });
+        });
+    })();
+</script>
 {% endblock %}
