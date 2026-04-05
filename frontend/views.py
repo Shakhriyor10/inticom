@@ -3,7 +3,10 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import F
 from django.db.models.functions import Abs
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.views.decorators.http import require_GET, require_POST
 
 from .forms import (
     EmailAuthenticationForm,
@@ -43,6 +46,7 @@ def home(request):
     )
 
 def profile_detail(request, profile_id):
+    review_page_size = 10
     Profile.deactivate_expired_hot_status()
     profile = get_object_or_404(
         Profile.objects.prefetch_related('photos', 'services__service_option'),
@@ -92,8 +96,78 @@ def profile_detail(request, profile_id):
             'massage_services': massage_services,
             'similar_profiles': similar_profiles,
             'review_form': review_form,
-            'profile_reviews': profile.reviews.select_related('author')[:8],
+            'profile_reviews': profile.reviews.select_related('author')[:review_page_size],
+            'review_page_size': review_page_size,
+            'has_more_reviews': profile.reviews.count() > review_page_size,
         },
+    )
+
+
+@login_required
+@require_POST
+def create_profile_review(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    review_form = ProfileReviewForm(request.POST)
+    if not review_form.is_valid():
+        return JsonResponse({'error': 'Введите корректный комментарий.'}, status=400)
+
+    review = ProfileReview.objects.create(
+        profile=profile,
+        author=request.user,
+        comment=review_form.cleaned_data['comment'],
+    )
+    review_html = render_to_string(
+        'partials/review_item.html',
+        {'review': review, 'request': request},
+    )
+    return JsonResponse({'review_html': review_html, 'review_id': review.id})
+
+
+@login_required
+@require_POST
+def delete_profile_review(request, review_id):
+    review = get_object_or_404(ProfileReview, id=review_id)
+    if review.author_id != request.user.id:
+        return JsonResponse({'error': 'Можно удалять только свои комментарии.'}, status=403)
+
+    review.delete()
+    return JsonResponse({'status': 'ok'})
+
+
+@require_GET
+def profile_reviews_chunk(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id)
+    try:
+        offset = int(request.GET.get('offset', 0))
+        limit = int(request.GET.get('limit', 10))
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Некорректные параметры пагинации.'}, status=400)
+
+    if offset < 0:
+        offset = 0
+    if limit < 1:
+        limit = 10
+    if limit > 50:
+        limit = 50
+
+    reviews = list(profile.reviews.select_related('author')[offset : offset + limit])
+    items = [
+        render_to_string(
+            'partials/review_item.html',
+            {'review': review, 'request': request},
+        )
+        for review in reviews
+    ]
+
+    total_reviews = profile.reviews.count()
+    next_offset = offset + len(reviews)
+
+    return JsonResponse(
+        {
+            'items': items,
+            'next_offset': next_offset,
+            'has_more': next_offset < total_reviews,
+        }
     )
 
 

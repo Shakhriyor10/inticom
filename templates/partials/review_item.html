@@ -1,0 +1,17 @@
+<div class="small border rounded p-2 mb-2 review-item" data-review-id="{{ review.id }}">
+    <div class="d-flex justify-content-between align-items-start gap-2">
+        <div class="fw-semibold">{{ review.author.username }}</div>
+        {% if request.user.is_authenticated and request.user.id == review.author_id %}
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-danger py-0 px-2 review-delete-btn"
+                data-review-id="{{ review.id }}"
+                title="Удалить комментарий"
+                aria-label="Удалить комментарий"
+            >
+                🗑️
+            </button>
+        {% endif %}
+    </div>
+    <div>{{ review.comment }}</div>
+</div>
