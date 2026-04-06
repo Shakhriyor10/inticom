@@ -55,6 +55,9 @@ class ProfileForm(forms.ModelForm):
                 continue
             field.widget.attrs['class'] = 'form-control'
 
+        self.fields['working_hours_from'].widget = forms.TimeInput(format='%H:%M', attrs={'type': 'time', 'class': 'form-control'})
+        self.fields['working_hours_to'].widget = forms.TimeInput(format='%H:%M', attrs={'type': 'time', 'class': 'form-control'})
+
         self.fields['description'].max_length = self.DESCRIPTION_MAX_LENGTH
         self.fields['description'].widget.attrs['maxlength'] = self.DESCRIPTION_MAX_LENGTH
         self.fields['description'].help_text = (
@@ -75,6 +78,8 @@ class ProfileForm(forms.ModelForm):
             'telegram_username',
             'outcall_available',
             'incall_available',
+            'working_hours_from',
+            'working_hours_to',
             'description',
             'price_per_hour',
             'price_for_two_hours',
@@ -92,6 +97,8 @@ class ProfileForm(forms.ModelForm):
             'telegram_username': 'Telegram username',
             'outcall_available': 'Выезд',
             'incall_available': 'У себя',
+            'working_hours_from': 'Время работы с',
+            'working_hours_to': 'Время работы до',
             'description': 'Описание профиля',
             'price_per_hour': 'Общая цена за 1 час',
             'price_for_two_hours': 'Общая цена за 2 часа',
@@ -105,6 +112,11 @@ class ProfileForm(forms.ModelForm):
 
         if not phone_number and not telegram_username:
             raise forms.ValidationError('Укажите номер телефона или Telegram username.')
+
+        working_from = cleaned_data.get('working_hours_from')
+        working_to = cleaned_data.get('working_hours_to')
+        if bool(working_from) ^ bool(working_to):
+            raise forms.ValidationError('Укажите и время начала, и время окончания работы.')
 
         cleaned_data['telegram_username'] = telegram_username
         return cleaned_data
