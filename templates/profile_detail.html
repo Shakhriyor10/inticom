@@ -185,6 +185,16 @@
                     <div class="col-sm-6"><div class="detail-info">Размер груди: <b>{{ profile.breast_size|default:'—' }}</b></div></div>
                     <div class="col-sm-12">
                         <div class="detail-info">
+                            Время работы:
+                            <b>
+                                {% if profile.working_hours_from and profile.working_hours_to %}
+                                    {{ profile.working_hours_from|time:'H:i' }} — {{ profile.working_hours_to|time:'H:i' }}
+                                {% else %}—{% endif %}
+                            </b>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="detail-info">
                             Прием:
                             <b>
                                 {% if profile.outcall_available %}Выезд{% endif %}

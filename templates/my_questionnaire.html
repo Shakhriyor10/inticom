@@ -32,6 +32,7 @@
                         <li class="list-group-item"><b>Пол:</b> {{ profile.get_gender_display }}</li>
                         <li class="list-group-item"><b>Рост / Вес:</b> {{ profile.height }} см / {{ profile.weight }} кг</li>
                         <li class="list-group-item"><b>Тип профиля:</b> {{ profile.get_profile_type_display }}</li>
+                        <li class="list-group-item"><b>Время работы:</b> {% if profile.working_hours_from and profile.working_hours_to %}{{ profile.working_hours_from|time:'H:i' }} — {{ profile.working_hours_to|time:'H:i' }}{% else %}—{% endif %}</li>
                         <li class="list-group-item">
                             <b>Описание:</b>
                             <span style="white-space: pre-wrap;">{{ profile.description }}</span>
