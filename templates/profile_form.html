@@ -11,7 +11,7 @@
             {% for field in form %}
                 <div class="{% if field.name == 'description' or field.name == 'outcall_available' or field.name == 'incall_available' %}col-12{% else %}col-md-6{% endif %}">
                     {% if field.name == 'outcall_available' or field.name == 'incall_available' %}
-                        <div class="form-check form-switch border rounded-3 px-3 py-2">
+                        <div class="form-check form-switch profile-availability-switch px-3 py-2">
                             {{ field }}
                             <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         </div>
