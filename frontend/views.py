@@ -39,7 +39,7 @@ def home(request):
     if visible_count < default_page_size:
         visible_count = default_page_size
 
-    # Profile.deactivate_expired_hot_status()
+    Profile.deactivate_expired_hot_status()
     profiles_qs = Profile.objects.filter(status=Profile.Status.ACTIVE).prefetch_related('photos').order_by(
         '-is_hot',
         '-created_at',
