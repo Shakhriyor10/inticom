@@ -21,6 +21,15 @@
                         {% if field.help_text %}
                             <div class="form-text">{{ field.help_text }}</div>
                         {% endif %}
+                        {% if field.name == 'description' %}
+                            <div
+                                class="form-text"
+                                id="description-counter"
+                                data-max-length="{{ field.field.max_length|default:600 }}"
+                            >
+                                Введено символов: 0. Осталось: {{ field.field.max_length|default:600 }}.
+                            </div>
+                        {% endif %}
                     {% endif %}
                     {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
                 </div>
@@ -54,4 +63,28 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const descriptionInput = document.getElementById('id_description');
+        const counter = document.getElementById('description-counter');
+
+        if (!descriptionInput || !counter) {
+            return;
+        }
+
+        const maxLength = Number(counter.dataset.maxLength || 600);
+
+        const updateCounter = () => {
+            const currentLength = descriptionInput.value.length;
+            const remaining = Math.max(maxLength - currentLength, 0);
+            counter.textContent = `Введено символов: ${currentLength}. Осталось: ${remaining}.`;
+        };
+
+        descriptionInput.addEventListener('input', updateCounter);
+        updateCounter();
+    });
+</script>
 {% endblock %}
