@@ -43,6 +43,8 @@ class SignUpForm(UserCreationForm):
 
 
 class ProfileForm(forms.ModelForm):
+    DESCRIPTION_MAX_LENGTH = 600
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
@@ -50,6 +52,12 @@ class ProfileForm(forms.ModelForm):
                 field.widget.attrs['class'] = 'form-check-input'
                 continue
             field.widget.attrs['class'] = 'form-control'
+
+        self.fields['description'].max_length = self.DESCRIPTION_MAX_LENGTH
+        self.fields['description'].widget.attrs['maxlength'] = self.DESCRIPTION_MAX_LENGTH
+        self.fields['description'].help_text = (
+            f'Максимум {self.DESCRIPTION_MAX_LENGTH} символов.'
+        )
 
     class Meta:
         model = Profile
@@ -98,6 +106,14 @@ class ProfileForm(forms.ModelForm):
 
         cleaned_data['telegram_username'] = telegram_username
         return cleaned_data
+
+    def clean_description(self):
+        description = (self.cleaned_data.get('description') or '').strip()
+        if len(description) > self.DESCRIPTION_MAX_LENGTH:
+            raise forms.ValidationError(
+                f'Описание профиля не должно превышать {self.DESCRIPTION_MAX_LENGTH} символов.'
+            )
+        return description
 
 
 class ServiceForm(forms.ModelForm):
