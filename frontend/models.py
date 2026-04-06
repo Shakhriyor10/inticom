@@ -15,6 +15,10 @@ class Profile(models.Model):
         BOTH = 'both', 'Массажистка и проститутка'
         TRANS = 'trans', 'Транссексуал'
 
+    class Status(models.TextChoices):
+        ACTIVE = 'active', 'Активный'
+        INACTIVE = 'inactive', 'Неактивный'
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=120)
     age = models.PositiveSmallIntegerField()
@@ -33,6 +37,12 @@ class Profile(models.Model):
     price_for_night = models.PositiveIntegerField('Цена анкеты за ночь', null=True, blank=True)
     is_hot = models.BooleanField(default=False, verbose_name='VIP/Топ анкета')
     hot_until = models.DateField(null=True, blank=True, verbose_name='VIP активен до')
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.ACTIVE,
+        verbose_name='Статус анкеты',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
