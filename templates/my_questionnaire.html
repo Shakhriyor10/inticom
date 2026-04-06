@@ -21,8 +21,14 @@
                 <h1 class="h3 page-title">Моя анкета</h1>
                 {% if profile %}
                     <p class="muted">Полная информация вашей анкеты.</p>
+                    {% if profile.status == 'inactive' %}
+                        <div class="alert alert-warning">
+                            Ваша анкета отключена администратором. Она не показывается на главной странице и недоступна для просмотра другим пользователям.
+                        </div>
+                    {% endif %}
                     <ul class="list-group mb-3">
                         <li class="list-group-item"><b>Имя:</b> {{ profile.name }}, {{ profile.age }}</li>
+                        <li class="list-group-item"><b>Статус анкеты:</b> {{ profile.get_status_display }}</li>
                         <li class="list-group-item"><b>Пол:</b> {{ profile.get_gender_display }}</li>
                         <li class="list-group-item"><b>Рост / Вес:</b> {{ profile.height }} см / {{ profile.weight }} кг</li>
                         <li class="list-group-item"><b>Тип профиля:</b> {{ profile.get_profile_type_display }}</li>
