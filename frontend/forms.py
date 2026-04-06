@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
@@ -109,6 +111,8 @@ class ProfileForm(forms.ModelForm):
 
     def clean_description(self):
         description = (self.cleaned_data.get('description') or '').strip()
+        description = description.replace('\r\n', '\n').replace('\r', '\n')
+        description = re.sub(r'\n\s*\n+', '\n\n', description)
         if len(description) > self.DESCRIPTION_MAX_LENGTH:
             raise forms.ValidationError(
                 f'Описание профиля не должно превышать {self.DESCRIPTION_MAX_LENGTH} символов.'
