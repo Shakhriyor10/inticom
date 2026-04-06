@@ -31,6 +31,8 @@ class Profile(models.Model):
     telegram_username = models.CharField(max_length=64, blank=True, verbose_name='Telegram username')
     outcall_available = models.BooleanField(default=False, verbose_name='Выезд')
     incall_available = models.BooleanField(default=False, verbose_name='У себя')
+    working_hours_from = models.TimeField(null=True, blank=True, verbose_name='Время работы с')
+    working_hours_to = models.TimeField(null=True, blank=True, verbose_name='Время работы до')
     description = models.TextField()
     price_per_hour = models.PositiveIntegerField('Цена анкеты за 1 час', null=True, blank=True)
     price_for_two_hours = models.PositiveIntegerField('Цена анкеты за 2 часа', null=True, blank=True)
