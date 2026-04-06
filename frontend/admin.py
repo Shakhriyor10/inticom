@@ -15,14 +15,16 @@ class ProfileAdmin(admin.ModelAdmin):
         'user',
         'age',
         'profile_type',
+        'status',
         'is_hot',
         'hot_until',
+        'status',
         'price_per_hour',
         'price_for_two_hours',
         'price_for_night',
         'created_at',
     )
-    list_filter = ('profile_type', 'is_hot')
+    list_filter = ('profile_type', 'status', 'is_hot')
     inlines = [ProfilePhotoInline]
 
 

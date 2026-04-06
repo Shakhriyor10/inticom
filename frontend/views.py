@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import F
 from django.db.models.functions import Abs
+from django.http import Http404
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -30,7 +31,10 @@ def home(request):
         visible_count = default_page_size
 
     Profile.deactivate_expired_hot_status()
-    profiles_qs = Profile.objects.prefetch_related('photos').order_by('-is_hot', '-created_at')
+    profiles_qs = Profile.objects.filter(status=Profile.Status.ACTIVE).prefetch_related('photos').order_by(
+        '-is_hot',
+        '-created_at',
+    )
     profiles = profiles_qs[:visible_count]
     has_more = profiles_qs.count() > visible_count
 
@@ -52,6 +56,12 @@ def profile_detail(request, profile_id):
         Profile.objects.prefetch_related('photos', 'services__service_option'),
         id=profile_id,
     )
+    if profile.status == Profile.Status.INACTIVE:
+        if request.user.is_authenticated and request.user.id == profile.user_id:
+            messages.warning(request, 'Ваша анкета отключена администратором и скрыта с главной страницы.')
+            return redirect('my_questionnaire')
+        raise Http404
+
     review_form = ProfileReviewForm()
     if request.method == 'POST':
         if not request.user.is_authenticated:
@@ -72,6 +82,7 @@ def profile_detail(request, profile_id):
     massage_services = profile.services.filter(service_option__category=Service.Category.MASSAGE)
     similar_profiles = (
         Profile.objects.filter(
+            status=Profile.Status.ACTIVE,
             height__gte=profile.height - 15,
             height__lte=profile.height + 15,
             weight__gte=profile.weight - 5,
@@ -106,7 +117,7 @@ def profile_detail(request, profile_id):
 @login_required
 @require_POST
 def create_profile_review(request, profile_id):
-    profile = get_object_or_404(Profile, id=profile_id)
+    profile = get_object_or_404(Profile, id=profile_id, status=Profile.Status.ACTIVE)
     review_form = ProfileReviewForm(request.POST)
     if not review_form.is_valid():
         return JsonResponse({'error': 'Введите корректный комментарий.'}, status=400)
@@ -136,7 +147,7 @@ def delete_profile_review(request, review_id):
 
 @require_GET
 def profile_reviews_chunk(request, profile_id):
-    profile = get_object_or_404(Profile, id=profile_id)
+    profile = get_object_or_404(Profile, id=profile_id, status=Profile.Status.ACTIVE)
     try:
         offset = int(request.GET.get('offset', 0))
         limit = int(request.GET.get('limit', 10))
