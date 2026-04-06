@@ -21,6 +21,15 @@ from .models import Profile, ProfilePhoto, ProfileReview, Service
 
 
 def home(request):
+    start_param = request.GET.get('tgWebAppStartParam', '').strip()
+
+    if start_param.startswith('profiles_'):
+        try:
+            profile_id = int(start_param.split('_')[1])
+            return redirect(f'/profiles/{profile_id}/')
+        except (IndexError, ValueError):
+            pass
+
     default_page_size = 16
     try:
         visible_count = int(request.GET.get('count', default_page_size))
