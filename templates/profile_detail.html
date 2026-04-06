@@ -93,6 +93,10 @@
         flex-shrink: 0;
     }
     .detail-right-col { display: grid; gap: .85rem; }
+    .preserve-description-format {
+        white-space: pre-wrap;
+        margin-bottom: 0;
+    }
 
     @media (max-width: 991.98px) {
         .profile-detail-layout { grid-template-columns: 1fr; }
@@ -216,7 +220,7 @@
 
                 <div class="detail-block">
                     <h2 class="h5 mb-2">Описание</h2>
-                    <p class="mb-0">{{ profile.description }}</p>
+                    <p class="preserve-description-format">{{ profile.description }}</p>
                 </div>
             </div>
         </div>

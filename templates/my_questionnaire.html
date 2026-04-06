@@ -32,7 +32,10 @@
                         <li class="list-group-item"><b>Пол:</b> {{ profile.get_gender_display }}</li>
                         <li class="list-group-item"><b>Рост / Вес:</b> {{ profile.height }} см / {{ profile.weight }} кг</li>
                         <li class="list-group-item"><b>Тип профиля:</b> {{ profile.get_profile_type_display }}</li>
-                        <li class="list-group-item"><b>Описание:</b> {{ profile.description }}</li>
+                        <li class="list-group-item">
+                            <b>Описание:</b>
+                            <span style="white-space: pre-wrap;">{{ profile.description }}</span>
+                        </li>
                     </ul>
 
                     {% if profile.photos.all %}
